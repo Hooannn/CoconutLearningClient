@@ -3,11 +3,12 @@ import cookies from "../libs/cookies";
 import { onError } from "../utils/error-handlers";
 import { Credentials, IResponseData, IUser } from "../types";
 import { useNavigate } from "react-router-dom";
-import { rawAxios } from "../hooks/useAxiosIns";
+import useAxiosIns, { rawAxios } from "../hooks/useAxiosIns";
 import { toast } from "react-hot-toast";
 import useAuthStore from "../stores/auth";
 import useAppStore from "../stores/app";
 const useAuth = () => {
+  const axios = useAxiosIns();
   const navigate = useNavigate();
   const {
     setAccessToken,
@@ -53,8 +54,8 @@ const useAuth = () => {
 
   const signOutMutation = useMutation({
     mutationFn: () => {
-      return rawAxios.post<IResponseData<unknown>>(`/api/v1/auth/sign-out`, {
-        client: "web",
+      return axios.post<IResponseData<unknown>>(`/api/v1/auth/sign-out`, {
+        platform: "WEB",
       });
     },
     onError: onError,

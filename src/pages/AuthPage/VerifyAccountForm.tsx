@@ -65,7 +65,7 @@ export default function VerifyAccountForm() {
       </div>
       <div className="flex flex-col gap-2 mt-4">
         <Button
-          isLoading={verifyAccountMutation.isPending}
+          isLoading={verifyAccountMutation.isLoading}
           onClick={handleSubmit(onSubmit)}
           color="primary"
           size="lg"
@@ -73,7 +73,7 @@ export default function VerifyAccountForm() {
           Submit
         </Button>
         <Button
-          isLoading={resendVerifyAccountMutation.isPending}
+          isLoading={resendVerifyAccountMutation.isLoading}
           onClick={() => {
             resendVerifyAccountMutation.mutate({
               email: atob(searchParams.get("email")?.toString() ?? ""),

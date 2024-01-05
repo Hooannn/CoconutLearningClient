@@ -131,7 +131,7 @@ export default function ResetPasswordForm() {
       </div>
       <div className="flex flex-col gap-2 mt-4">
         <Button
-          isLoading={resetPasswordMutation.isPending}
+          isLoading={resetPasswordMutation.isLoading}
           onClick={handleSubmit(onSubmit)}
           color="primary"
           size="lg"

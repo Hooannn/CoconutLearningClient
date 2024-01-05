@@ -139,7 +139,7 @@ export default function SignInForm() {
       <div className="flex flex-col gap-2 mt-4">
         <Button
           isLoading={
-            signInMutation.isPending || signInWithGoogleMutation.isPending
+            signInMutation.isLoading || signInWithGoogleMutation.isLoading
           }
           onClick={handleSubmit(onSubmit)}
           color="primary"
@@ -149,7 +149,7 @@ export default function SignInForm() {
         </Button>
         <Button
           isLoading={
-            signInMutation.isPending || signInWithGoogleMutation.isPending
+            signInMutation.isLoading || signInWithGoogleMutation.isLoading
           }
           variant="flat"
           onClick={() => googleLogin()}

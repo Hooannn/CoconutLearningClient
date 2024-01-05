@@ -194,7 +194,7 @@ export default function SignUpForm() {
       </div>
       <div className="flex flex-col gap-2 mt-4">
         <Button
-          isLoading={signUpMutation.isPending}
+          isLoading={signUpMutation.isLoading}
           onClick={handleSubmit(onSubmit)}
           color="primary"
           size="lg"
@@ -202,7 +202,7 @@ export default function SignUpForm() {
           Sign Up
         </Button>
         <Button
-          isLoading={signUpMutation.isPending}
+          isLoading={signUpMutation.isLoading}
           variant="flat"
           onClick={() => googleLogin()}
           size="lg"

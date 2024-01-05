@@ -1,17 +1,20 @@
 import { axiosIns } from "./useAxiosIns";
 import useAuthStore from "../stores/auth";
 import { toast } from "react-hot-toast";
+import useAppStore from "../stores/app";
 
 const useRefreshToken = () => {
   const {
-    reset,
+    reset: resetAuthStore,
     refreshToken: storedRefreshToken,
     setRefreshToken,
     setAccessToken,
   } = useAuthStore();
+  const { reset: resetAppStore } = useAppStore();
   const handleError = () => {
     toast.error("Login session expired, please login again");
-    reset();
+    resetAuthStore();
+    resetAppStore();
     window.location.href = "/auth";
   };
 

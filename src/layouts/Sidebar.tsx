@@ -1,34 +1,40 @@
-import { Sidebar as ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import {
-  AiFillVideoCamera,
-  AiOutlineDashboard,
+  Sidebar as ProSidebar,
+  Menu,
+  MenuItem,
+  SubMenu,
+} from "react-pro-sidebar";
+import {
   AiOutlineCarryOut,
+  AiOutlineHome,
+  AiOutlineUser,
 } from "react-icons/ai";
+import { BsCardChecklist } from "react-icons/bs";
+import { FiUsers } from "react-icons/fi";
+import { RiGraduationCapLine } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import useAuthStore from "../stores/auth";
+import { AiOutlineBars } from "react-icons/ai";
+import { Avatar, Button, Divider } from "@nextui-org/react";
+import { IoMdFolderOpen } from "react-icons/io";
+import useClassroomStore from "../stores/classroom";
 const menuItems = [
   {
     to: "/",
-    icon: <AiOutlineDashboard size={25} />,
+    icon: <AiOutlineHome size={20} />,
     label: "Dashboard",
   },
   {
     to: "/calendar",
-    icon: <AiOutlineCarryOut size={25} />,
+    icon: <AiOutlineCarryOut size={20} />,
     label: "Calendar",
-  },
-  {
-    to: "/meeting",
-    icon: <AiFillVideoCamera size={25} />,
-    label: "Video",
   },
 ];
 export default function Sidebar() {
   const location = useLocation();
+  const { registeredClassrooms, teachingClassrooms } = useClassroomStore();
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("Dashboard");
-  const { user } = useAuthStore();
   const navigate = useNavigate();
   const onMenuItemClick = (item: {
     to: string;
@@ -47,16 +53,29 @@ export default function Sidebar() {
     <>
       <ProSidebar collapsed={collapsed} collapsedWidth="100px">
         <div className="h-full flex flex-col align-center px-3">
+          <Button
+            onClick={() => setCollapsed(!collapsed)}
+            isIconOnly
+            className="absolute top-4 right-[-20px]"
+          >
+            <AiOutlineBars className="w-4 h-4" />
+          </Button>
           <div className="w-full py-8">
-            <img className="mx-auto" width="50" src="/vite.svg" alt="logo" />
+            <img
+              className="mx-auto"
+              width={collapsed ? "70" : "150"}
+              src="/coconut 2.png"
+              alt="logo"
+            />
           </div>
           <Menu
             menuItemStyles={{
               button: ({ level, active }) => {
                 if (level === 0)
                   return {
-                    color: active ? "rgb(3 105 161)" : "silver",
-                    backgroundColor: active ? "rgb(186 230 253)" : undefined,
+                    color: active ? "rgb(3 105 161)" : "black",
+                    backgroundColor: active ? "rgb(186 230 253)" : "undefined",
+                    fontWeight: active ? "bold" : "medium",
                     borderRadius: "12px",
                     margin: "4px 0",
                   };
@@ -70,11 +89,87 @@ export default function Sidebar() {
                 active={activeTab === item.label}
                 icon={item.icon}
               >
-                {!collapsed && (
-                  <div className="text-sm font-medium">{item.label}</div>
-                )}
+                {!collapsed && <div className="text-sm">{item.label}</div>}
               </MenuItem>
             ))}
+            <Divider></Divider>
+            <SubMenu
+              className="text-sm"
+              icon={<FiUsers size={20} />}
+              label="Teaching"
+            >
+              <MenuItem
+                active={activeTab === "NeedReview"}
+                icon={<IoMdFolderOpen size={20} />}
+              >
+                Need review
+              </MenuItem>
+              {teachingClassrooms.map((classroom) => (
+                <MenuItem
+                  key={classroom.id}
+                  icon={
+                    <Avatar
+                      size="sm"
+                      fallback={
+                        <AiOutlineUser
+                          className="text-default-500"
+                          fill="currentColor"
+                          size={20}
+                        />
+                      }
+                      showFallback
+                      src={classroom.owner.avatar_url}
+                    />
+                  }
+                >
+                  <div className="flex flex-col font-medium">
+                    <div className="truncate">{classroom.name}</div>
+                    <div className="text-muted-foreground text-xs font-thin truncate">
+                      {classroom.description}
+                    </div>
+                  </div>
+                </MenuItem>
+              ))}
+            </SubMenu>
+            <Divider></Divider>
+            <SubMenu
+              className="text-sm"
+              icon={<RiGraduationCapLine size={20} />}
+              label="Registered"
+            >
+              <MenuItem
+                active={activeTab === "Todo"}
+                icon={<BsCardChecklist size={20} />}
+              >
+                Todo
+              </MenuItem>
+              {registeredClassrooms.map((classroom) => (
+                <MenuItem
+                  key={classroom.id}
+                  icon={
+                    <Avatar
+                      size="sm"
+                      fallback={
+                        <AiOutlineUser
+                          className="text-default-500"
+                          fill="currentColor"
+                          size={20}
+                        />
+                      }
+                      showFallback
+                      src={classroom.owner.avatar_url}
+                    />
+                  }
+                >
+                  <div className="flex flex-col font-medium">
+                    <div className="truncate">{classroom.name}</div>
+                    <div className="text-muted-foreground text-xs font-thin truncate">
+                      {classroom.description}
+                    </div>
+                  </div>
+                </MenuItem>
+              ))}
+            </SubMenu>
           </Menu>
         </div>
       </ProSidebar>

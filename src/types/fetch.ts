@@ -11,3 +11,8 @@ export interface IResponseData<T> {
 export interface Response<T> extends AxiosResponse {
   data: IResponseData<T>;
 }
+
+export interface GetQuery {
+  offset?: number;
+  limit?: number;
+}

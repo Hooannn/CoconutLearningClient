@@ -71,7 +71,7 @@ export default function ForgotPasswordForm() {
       </div>
       <div className="flex flex-col gap-2 mt-4">
         <Button
-          isLoading={forgotPasswordMutation.isPending}
+          isLoading={forgotPasswordMutation.isLoading}
           onClick={handleSubmit(onSubmit)}
           color="primary"
           size="lg"
