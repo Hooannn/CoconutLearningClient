@@ -10,7 +10,7 @@ export default function MainLayout() {
         <div className="h-20 flex justify-between items-center p-10 border-1 border-x-0">
           <NavBar />
         </div>
-        <div className="h-full py-4 px-2 overflow-auto">
+        <div className="h-full overflow-auto relative">
           <Outlet />
         </div>
       </div>

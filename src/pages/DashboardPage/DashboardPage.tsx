@@ -10,7 +10,7 @@ export default function DashboardPage() {
   const [shouldJoinModalOpen, setJoinModalOpen] = useState(false);
   const [shouldCreateModalOpen, setCreateModalOpen] = useState(false);
   return (
-    <div>
+    <div className="py-4 px-2">
       <JoinClassroomModal
         isOpen={shouldJoinModalOpen}
         onClose={() => setJoinModalOpen(false)}

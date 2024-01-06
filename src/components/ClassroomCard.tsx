@@ -14,6 +14,7 @@ import { AiOutlineUser } from "react-icons/ai";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { LuUserSquare2 } from "react-icons/lu";
 import useAuthStore from "../stores/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function ClassroomCard(props: { classroom: Classroom }) {
   const { user } = useAuthStore();
@@ -21,12 +22,13 @@ export default function ClassroomCard(props: { classroom: Classroom }) {
     props.classroom.providers.some((p) => p.id === user?.id) ||
     props.classroom.owner.id === user?.id;
 
+  const navigate = useNavigate();
   return (
     <Card
       className="w-72"
       shadow="sm"
       isPressable
-      onPress={() => console.log("item pressed")}
+      onPress={() => navigate(`/classroom/${props.classroom.id}`)}
     >
       <CardBody className="overflow-visible p-0">
         <Image

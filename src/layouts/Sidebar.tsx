@@ -12,10 +12,10 @@ import {
 import { BsCardChecklist } from "react-icons/bs";
 import { FiUsers } from "react-icons/fi";
 import { RiGraduationCapLine } from "react-icons/ri";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineBars } from "react-icons/ai";
-import { Avatar, Button, Divider } from "@nextui-org/react";
+import { Avatar, Button, Divider, Image } from "@nextui-org/react";
 import { IoMdFolderOpen } from "react-icons/io";
 import useClassroomStore from "../stores/classroom";
 const menuItems = [
@@ -34,7 +34,6 @@ export default function Sidebar() {
   const location = useLocation();
   const { registeredClassrooms, teachingClassrooms } = useClassroomStore();
   const [collapsed, setCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("Dashboard");
   const navigate = useNavigate();
   const onMenuItemClick = (item: {
     to: string;
@@ -44,11 +43,6 @@ export default function Sidebar() {
     navigate(item.to);
   };
 
-  useEffect(() => {
-    setActiveTab(
-      menuItems.find((item) => item.to === location.pathname)?.label as string
-    );
-  }, [location]);
   return (
     <>
       <ProSidebar collapsed={collapsed} collapsedWidth="100px">
@@ -61,8 +55,10 @@ export default function Sidebar() {
             <AiOutlineBars className="w-4 h-4" />
           </Button>
           <div className="w-full py-8">
-            <img
-              className="mx-auto"
+            <Image
+              onClick={() => navigate("/")}
+              removeWrapper
+              className="mx-auto cursor-pointer"
               width={collapsed ? "70" : "150"}
               src="/coconut 2.png"
               alt="logo"
@@ -70,15 +66,14 @@ export default function Sidebar() {
           </div>
           <Menu
             menuItemStyles={{
-              button: ({ level, active }) => {
-                if (level === 0)
-                  return {
-                    color: active ? "rgb(3 105 161)" : "black",
-                    backgroundColor: active ? "rgb(186 230 253)" : "undefined",
-                    fontWeight: active ? "bold" : "medium",
-                    borderRadius: "12px",
-                    margin: "4px 0",
-                  };
+              button: ({ active }) => {
+                return {
+                  color: active ? "rgb(3 105 161)" : "black",
+                  backgroundColor: active ? "rgb(186 230 253)" : "undefined",
+                  fontWeight: active ? "bold" : "medium",
+                  borderRadius: "12px",
+                  margin: "4px 0",
+                };
               },
             }}
           >
@@ -86,7 +81,7 @@ export default function Sidebar() {
               <MenuItem
                 key={item.label}
                 onClick={() => onMenuItemClick(item)}
-                active={activeTab === item.label}
+                active={location.pathname === item.to}
                 icon={item.icon}
               >
                 {!collapsed && <div className="text-sm">{item.label}</div>}
@@ -99,7 +94,8 @@ export default function Sidebar() {
               label="Teaching"
             >
               <MenuItem
-                active={activeTab === "NeedReview"}
+                onClick={() => navigate(`/need-review`)}
+                active={location.pathname === "/need-review"}
                 icon={<IoMdFolderOpen size={20} />}
               >
                 Need review
@@ -107,6 +103,8 @@ export default function Sidebar() {
               {teachingClassrooms.map((classroom) => (
                 <MenuItem
                   key={classroom.id}
+                  active={location.pathname === `/classroom/${classroom.id}`}
+                  onClick={() => navigate(`/classroom/${classroom.id}`)}
                   icon={
                     <Avatar
                       size="sm"
@@ -138,7 +136,8 @@ export default function Sidebar() {
               label="Registered"
             >
               <MenuItem
-                active={activeTab === "Todo"}
+                active={location.pathname === "/todo"}
+                onClick={() => navigate(`/todo`)}
                 icon={<BsCardChecklist size={20} />}
               >
                 Todo
@@ -146,6 +145,8 @@ export default function Sidebar() {
               {registeredClassrooms.map((classroom) => (
                 <MenuItem
                   key={classroom.id}
+                  active={location.pathname === `/classroom/${classroom.id}`}
+                  onClick={() => navigate(`/classroom/${classroom.id}`)}
                   icon={
                     <Avatar
                       size="sm"

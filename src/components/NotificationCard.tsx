@@ -31,7 +31,7 @@ export default function NotificationCard(props: {
               size="md"
               src={props.notification.image_url}
             />
-            <div className="flex flex-col">
+            <div className="flex flex-col max-w-[240px]">
               <div className="font-bold">{props.notification.title}</div>
               <div className="text-xs">{props.notification.content}</div>
             </div>

@@ -4,6 +4,8 @@ import DashboardPage from "../pages/DashboardPage";
 import ErrorPage from "../pages/ErrorPage";
 import MainLayout from "../layouts/MainLayout";
 import Global from "../Global";
+import ClassroomPage from "../pages/ClassroomPage";
+import CalendarPage from "../pages/CalendarPage";
 const rootRouter = [
   {
     path: "/",
@@ -20,6 +22,22 @@ const rootRouter = [
       {
         path: "/",
         element: <DashboardPage />,
+      },
+      {
+        path: "/calendar",
+        element: <CalendarPage />,
+      },
+      {
+        path: "/need-review",
+        element: <div>Hello</div>,
+      },
+      {
+        path: "/todo",
+        element: <div>Hello</div>,
+      },
+      {
+        path: "/classroom/:classroomId",
+        element: <ClassroomPage />,
       },
     ],
     errorElement: <ErrorPage />,
