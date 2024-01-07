@@ -4,6 +4,7 @@ import { AiOutlineUser, AiOutlineUserAdd } from "react-icons/ai";
 import { FaEllipsisVertical } from "react-icons/fa6";
 import InviteModal, { InviteType } from "./InviteModal";
 import { useState } from "react";
+import SVG2 from "../../components/SVG2";
 
 export default function MembersTab(props: {
   classroom: Classroom;
@@ -48,7 +49,7 @@ export default function MembersTab(props: {
                     className="flex items-center justify-between"
                   >
                     <User
-                      name={provider.fullName}
+                      name={provider.first_name + " " + provider.last_name}
                       description={provider.email}
                       avatarProps={{
                         src: provider.avatar_url,
@@ -75,7 +76,7 @@ export default function MembersTab(props: {
             </div>
           </CardBody>
         </Card>
-        {props.classroom.users.length > 0 && (
+        {(props.classroom.users.length > 0 || props.isOwner) && (
           <Card shadow="sm" className="w-full">
             <CardBody>
               <div className="py-2 flex items-center justify-between">
@@ -97,34 +98,56 @@ export default function MembersTab(props: {
               </div>
               <Divider />
               <div className="flex flex-col gap-2 py-2">
-                {props.classroom.users.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between"
-                  >
-                    <User
-                      name={user.fullName}
-                      description={user.email}
-                      avatarProps={{
-                        src: user.avatar_url,
-                        fallback: (
-                          <AiOutlineUser
-                            className="w-6 h-6 text-default-500"
-                            fill="currentColor"
-                            size={20}
-                          />
-                        ),
-                        showFallback: true,
-                        className: "w-12 h-12",
+                {props.classroom.users.length > 0 ? (
+                  <>
+                    {props.classroom.users.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between"
+                      >
+                        <User
+                          name={user.first_name + " " + user.last_name}
+                          description={user.email}
+                          avatarProps={{
+                            src: user.avatar_url,
+                            fallback: (
+                              <AiOutlineUser
+                                className="w-6 h-6 text-default-500"
+                                fill="currentColor"
+                                size={20}
+                              />
+                            ),
+                            showFallback: true,
+                            className: "w-12 h-12",
+                          }}
+                        />
+                        {props.isOwner && (
+                          <Button radius="full" isIconOnly variant="light">
+                            <FaEllipsisVertical size={16} />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center py-12">
+                    <div className="w-40 py-4">
+                      <SVG2 />
+                    </div>
+                    <small>Add students to this class</small>
+                    <Button
+                      onClick={() => {
+                        setInviteType(InviteType.USER);
+                        setShowInviteModal(true);
                       }}
-                    />
-                    {props.isOwner && (
-                      <Button radius="full" isIconOnly variant="light">
-                        <FaEllipsisVertical size={16} />
-                      </Button>
-                    )}
+                      className="w-36 mt-2"
+                      color="primary"
+                      variant="flat"
+                    >
+                      <AiOutlineUserAdd size={20} /> Invite students
+                    </Button>
                   </div>
-                ))}
+                )}
               </div>
             </CardBody>
           </Card>

@@ -6,255 +6,112 @@ import {
   ModalFooter,
   Button,
   Input,
-  Chip,
-  ScrollShadow,
-  Avatar,
-  Listbox,
-  ListboxItem,
+  Skeleton,
+  User,
 } from "@nextui-org/react";
-import { useState, useMemo, PropsWithChildren } from "react";
-const users = [
-  {
-    id: 1,
-    name: "Tony Reichert",
-    role: "CEO",
-    team: "Management",
-    status: "active",
-    age: "29",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/1.png",
-    email: "tony.reichert@example.com",
-  },
-  {
-    id: 2,
-    name: "Zoey Lang",
-    role: "Tech Lead",
-    team: "Development",
-    status: "paused",
-    age: "25",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/1.png",
-    email: "zoey.lang@example.com",
-  },
-  {
-    id: 3,
-    name: "Jane Fisher",
-    role: "Sr. Dev",
-    team: "Development",
-    status: "active",
-    age: "22",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/2.png",
-    email: "jane.fisher@example.com",
-  },
-  {
-    id: 4,
-    name: "William Howard",
-    role: "C.M.",
-    team: "Marketing",
-    status: "vacation",
-    age: "28",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/2.png",
-    email: "william.howard@example.com",
-  },
-  {
-    id: 5,
-    name: "Kristen Copper",
-    role: "S. Manager",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/3.png",
-    email: "kristen.cooper@example.com",
-  },
-  {
-    id: 6,
-    name: "Brian Kim",
-    role: "P. Manager",
-    team: "Management",
-    age: "29",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/3.png",
-    email: "brian.kim@example.com",
-    status: "Active",
-  },
-  {
-    id: 7,
-    name: "Michael Hunt",
-    role: "Designer",
-    team: "Design",
-    status: "paused",
-    age: "27",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/4.png",
-    email: "michael.hunt@example.com",
-  },
-  {
-    id: 8,
-    name: "Samantha Brooks",
-    role: "HR Manager",
-    team: "HR",
-    status: "active",
-    age: "31",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/4.png",
-    email: "samantha.brooks@example.com",
-  },
-  {
-    id: 9,
-    name: "Frank Harrison",
-    role: "F. Manager",
-    team: "Finance",
-    status: "vacation",
-    age: "33",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/5.png",
-    email: "frank.harrison@example.com",
-  },
-  {
-    id: 10,
-    name: "Emma Adams",
-    role: "Ops Manager",
-    team: "Operations",
-    status: "active",
-    age: "35",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/5.png",
-    email: "emma.adams@example.com",
-  },
-  {
-    id: 11,
-    name: "Brandon Stevens",
-    role: "Jr. Dev",
-    team: "Development",
-    status: "active",
-    age: "22",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/7.png",
-    email: "brandon.stevens@example.com",
-  },
-  {
-    id: 12,
-    name: "Megan Richards",
-    role: "P. Manager",
-    team: "Product",
-    status: "paused",
-    age: "28",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/7.png",
-    email: "megan.richards@example.com",
-  },
-  {
-    id: 13,
-    name: "Oliver Scott",
-    role: "S. Manager",
-    team: "Security",
-    status: "active",
-    age: "37",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/8.png",
-    email: "oliver.scott@example.com",
-  },
-  {
-    id: 14,
-    name: "Grace Allen",
-    role: "M. Specialist",
-    team: "Marketing",
-    status: "active",
-    age: "30",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/8.png",
-    email: "grace.allen@example.com",
-  },
-  {
-    id: 15,
-    name: "Noah Carter",
-    role: "IT Specialist",
-    team: "I. Technology",
-    status: "paused",
-    age: "31",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/9.png",
-    email: "noah.carter@example.com",
-  },
-  {
-    id: 16,
-    name: "Ava Perez",
-    role: "Manager",
-    team: "Sales",
-    status: "active",
-    age: "29",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/9.png",
-    email: "ava.perez@example.com",
-  },
-  {
-    id: 17,
-    name: "Liam Johnson",
-    role: "Data Analyst",
-    team: "Analysis",
-    status: "active",
-    age: "28",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/11.png",
-    email: "liam.johnson@example.com",
-  },
-  {
-    id: 18,
-    name: "Sophia Taylor",
-    role: "QA Analyst",
-    team: "Testing",
-    status: "active",
-    age: "27",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/11.png",
-    email: "sophia.taylor@example.com",
-  },
-  {
-    id: 19,
-    name: "Lucas Harris",
-    role: "Administrator",
-    team: "Information Technology",
-    status: "paused",
-    age: "32",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/male/12.png",
-    email: "lucas.harris@example.com",
-  },
-  {
-    id: 20,
-    name: "Mia Robinson",
-    role: "Coordinator",
-    team: "Operations",
-    status: "active",
-    age: "26",
-    avatar: "https://d2u8k2ocievbld.cloudfront.net/memojis/female/12.png",
-    email: "mia.robinson@example.com",
-  },
-];
-
+import { useQuery } from "@tanstack/react-query";
+import { useState, useMemo } from "react";
+import useAxiosIns from "../../hooks/useAxiosIns";
+import { IResponseData, IUser } from "../../types";
+import { useDebounce } from "@uidotdev/usehooks";
+import SVG2 from "../../components/SVG2";
+import {
+  AiFillCheckCircle,
+  AiOutlineClose,
+  AiOutlineUser,
+} from "react-icons/ai";
 export enum InviteType {
   PROVIDER,
   USER,
 }
-
-export const ListboxWrapper = ({ children }: PropsWithChildren) => (
-  <div className="w-full px-1 py-2 border-small rounded-small border-default-200 dark:border-default-100">
-    {children}
-  </div>
-);
-
+let typingTimeout: NodeJS.Timeout | null = null;
 export default function InviteModal(props: {
   isOpen: boolean;
   onClose: () => void;
   type: InviteType;
 }) {
-  const [values, setValues] = useState(new Set(["1"]));
+  const axios = useAxiosIns();
+  const [query, setQuery] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const debouncedQuery = useDebounce(query, 500);
+  const isSearching = query && query.trim().length > 0;
 
-  const arrayValues = Array.from(values);
+  const lookupUsersQuery = useQuery({
+    queryKey: ["lookupUsers", debouncedQuery],
+    queryFn: () => {
+      if (isSearching)
+        return axios.get<IResponseData<IUser[]>>(
+          `/api/v1/search/users/lookup`,
+          {
+            params: { q: debouncedQuery },
+          }
+        );
+      else return null;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const onSearchInputChange = (v: string) => {
+    setQuery(v);
+    setIsTyping(true);
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(() => {
+      setIsTyping(false);
+    }, 500);
+  };
+
+  const users = lookupUsersQuery.data?.data?.data || [];
+
+  const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
+
+  const isSelected = (userId: string) =>
+    selectedUsers.some((u) => u.id === userId);
 
   const topContent = useMemo(() => {
-    if (!arrayValues.length) {
+    if (!selectedUsers.length) {
       return null;
     }
 
     return (
-      <ScrollShadow
-        hideScrollBar
-        className="w-full flex py-0.5 px-2 gap-1"
-        orientation="horizontal"
-      >
-        {arrayValues.map((value) => (
-          <Chip key={value}>
-            {users.find((user) => `${user.id}` === `${value}`).name}
-          </Chip>
+      <div className="w-full flex flex-wrap gap-1 py-2">
+        {selectedUsers.map((user) => (
+          <div
+            key={user.id}
+            className="text-small flex items-center gap-1 bg-sky-100 rounded-full px-2 py-1"
+          >
+            <User
+              name={user.first_name + " " + user.last_name}
+              avatarProps={{
+                src: user.avatar_url,
+                fallback: (
+                  <AiOutlineUser
+                    className="text-default-500"
+                    fill="currentColor"
+                    size={20}
+                  />
+                ),
+                className: "w-7 h-7",
+                showFallback: true,
+              }}
+            />
+            <Button
+              variant="light"
+              size="sm"
+              className="h-5"
+              isIconOnly
+              radius="full"
+              onClick={() => {
+                setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
+              }}
+            >
+              <AiOutlineClose />
+            </Button>
+          </div>
         ))}
-      </ScrollShadow>
+      </div>
     );
-  }, [arrayValues.length]);
+  }, [selectedUsers.length]);
   return (
     <Modal isOpen={props.isOpen} onClose={props.onClose}>
       <ModalContent>
@@ -265,47 +122,103 @@ export default function InviteModal(props: {
                 ? "Invite providers"
                 : "Invite users"}
             </ModalHeader>
-            <ModalBody className="pt-0">
+            <ModalBody className="pt-0 gap-0">
               <Input
                 color="primary"
                 variant="underlined"
                 type="email"
-                placeholder="Enter email"
+                placeholder="Enter email or name"
+                value={query}
+                onValueChange={onSearchInputChange}
               />
-              <ListboxWrapper>
-                <Listbox
-                  topContent={topContent}
-                  classNames={{
-                    base: "w-full",
-                    list: "max-h-[300px] overflow-scroll",
-                  }}
-                  defaultSelectedKeys={["1"]}
-                  items={users}
-                  label="Assigned to"
-                  selectionMode="multiple"
-                  onSelectionChange={setValues}
-                  variant="flat"
-                >
-                  {(item) => (
-                    <ListboxItem key={item.id} textValue={item.name}>
-                      <div className="flex gap-2 items-center">
-                        <Avatar
-                          alt={item.name}
-                          className="flex-shrink-0"
-                          size="sm"
-                          src={item.avatar}
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-small">{item.name}</span>
-                          <span className="text-tiny text-default-400">
-                            {item.email}
-                          </span>
-                        </div>
+              {topContent}
+              {isTyping || lookupUsersQuery.isLoading ? (
+                <div className="flex flex-col gap-2 py-2">
+                  {Array(4)
+                    .fill(null)
+                    .map((i, a) => (
+                      <Skeleton
+                        key={"Skeletonss::" + a}
+                        className="rounded-lg w-full"
+                      >
+                        <div className="w-full h-24 rounded-lg bg-default-300"></div>
+                      </Skeleton>
+                    ))}
+                </div>
+              ) : (
+                <>
+                  {users.length > 0 ? (
+                    <>
+                      <div className="flex flex-col items-start py-1 max-h-[300px] overflow-auto">
+                        {users.map((user) => (
+                          <div
+                            onClick={() => {
+                              if (isSelected(user.id)) {
+                                setSelectedUsers((prev) => {
+                                  const newState = prev.filter(
+                                    (u) => u.id !== user.id
+                                  );
+                                  return newState;
+                                });
+                              } else {
+                                setSelectedUsers((prev) => [...prev, user]);
+                              }
+                            }}
+                            key={"uu::" + user.id}
+                            className="w-full hover:bg-slate-200 rounded-lg transition cursor-pointer p-2 flex items-center justify-between"
+                          >
+                            <User
+                              as="button"
+                              avatarProps={{
+                                src: user?.avatar_url,
+                                fallback: (
+                                  <AiOutlineUser
+                                    className="text-default-500"
+                                    fill="currentColor"
+                                    size={20}
+                                  />
+                                ),
+                                showFallback: true,
+                              }}
+                              className="transition-transform"
+                              description={user?.email}
+                              name={user?.first_name + " " + user?.last_name}
+                            />
+                            {isSelected(user.id) && (
+                              <AiFillCheckCircle
+                                className="text-green-500"
+                                size={20}
+                              />
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    </ListboxItem>
+                    </>
+                  ) : (
+                    <>
+                      {isSearching ? (
+                        <div className="flex flex-col items-center py-12">
+                          <div className="w-40 py-4">
+                            <SVG2 />
+                          </div>
+                          <small>Not found.</small>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center py-12">
+                          <div className="w-40 py-4">
+                            <SVG2 />
+                          </div>
+                          <small>
+                            {props.type == InviteType.PROVIDER
+                              ? "Start inviting provider"
+                              : "Start inviting students"}
+                          </small>
+                        </div>
+                      )}
+                    </>
                   )}
-                </Listbox>
-              </ListboxWrapper>
+                </>
+              )}
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>

@@ -85,7 +85,7 @@ export default function NavBar() {
               }}
               className="transition-transform"
               description={user?.role}
-              name={user?.fullName}
+              name={user?.first_name + " " + user?.last_name}
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="User Actions" variant="flat">

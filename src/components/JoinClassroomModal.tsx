@@ -96,7 +96,7 @@ export default function JoinClassroomModal(props: {
                   </div>
                   <div className="flex items-center justify-between w-full">
                     <User
-                      name={user?.fullName}
+                      name={user?.first_name + " " + user?.last_name}
                       description={user?.role}
                       avatarProps={{
                         src: user?.avatar_url,

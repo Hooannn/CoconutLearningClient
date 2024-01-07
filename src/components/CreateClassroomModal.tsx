@@ -46,7 +46,11 @@ export default function CreateClassroomModal(props: {
       description?: string;
       room?: string;
       course?: string;
-    }) => axios.post<IResponseData<Classroom>>(`/api/v1/classrooms`, params),
+    }) =>
+      axios.post<IResponseData<Classroom>>(`/api/v1/classrooms`, {
+        ...params,
+        cover_image_url: "/Honors_thumb.jpg",
+      }),
     onError,
     onSuccess(data) {
       toast.success(data.data?.message || "Created classroom successfully");
