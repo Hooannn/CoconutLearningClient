@@ -8,8 +8,15 @@ export interface Notification {
   actions: NotificationAction[];
 }
 
+export enum ActionType {
+  PRIMARY = "PRIMARY",
+  DANGER = "DANGER",
+  DEFAULT = "DEFAULT",
+}
+
 export interface NotificationAction {
   title: string;
   description: string;
   callback_url: string;
+  type: ActionType;
 }

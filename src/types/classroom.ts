@@ -1,4 +1,5 @@
 import { IUser } from ".";
+import { InviteType } from "../pages/ClassroomPage/InviteModal";
 
 export interface Classroom {
   id: string;
@@ -11,5 +12,6 @@ export interface Classroom {
   owner: IUser;
   providers: IUser[];
   users: IUser[];
-  invitations: { id: string; email: string }[];
+  invitations: { id: string; email: string; type: InviteType }[];
+  classwork_categories: { id: string; name: string }[];
 }

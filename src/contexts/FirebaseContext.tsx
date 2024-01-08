@@ -90,8 +90,19 @@ export const FirebaseProvider = ({
       });
 
       onMessage(getMessaging(firebaseApp), (payload) => {
-        console.log("Message received. ", payload);
-        // ...
+        const notificationTitle = payload.notification?.title ?? "Notification";
+        const notificationOptions = {
+          body: payload.notification?.body,
+          image: payload.notification?.image,
+        };
+        navigator.serviceWorker
+          .getRegistration("/firebase-cloud-messaging-push-scope")
+          .then((registration) => {
+            registration?.showNotification(
+              notificationTitle,
+              notificationOptions
+            );
+          });
       });
 
       return res;

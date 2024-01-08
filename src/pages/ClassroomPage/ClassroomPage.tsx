@@ -1,12 +1,25 @@
-import { Button, Spinner, Tab, Tabs, Tooltip } from "@nextui-org/react";
-import { useParams } from "react-router-dom";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Spinner,
+  Tab,
+  Tabs,
+  Tooltip,
+  useDisclosure,
+} from "@nextui-org/react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAuthStore from "../../stores/auth";
 import {
   AiOutlineSetting,
   AiOutlineCalendar,
   AiOutlineFolderOpen,
 } from "react-icons/ai";
-import { useQuery } from "@tanstack/react-query";
+import { IoExitOutline } from "react-icons/io5";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { IResponseData } from "../../types";
 import { Classroom } from "../../types/classroom";
@@ -16,7 +29,9 @@ import MembersTab from "./MembersTab";
 import ScoresTab from "./ScoresTab";
 import NotFound from "../../components/NotFound";
 import ClassroomSetting from "./ClassroomSetting";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { onError } from "../../utils/error-handlers";
 export default function ClassroomPage() {
   const { classroomId } = useParams();
   const { user } = useAuthStore();
@@ -34,8 +49,75 @@ export default function ClassroomPage() {
     classroom?.providers.some((p) => p.id === user?.id) || isOwner;
 
   const [shouldOpenSetting, setOpenSetting] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useState("feed");
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") ?? "feed";
+    setTab(tab);
+  }, [searchParams]);
+
+  const {
+    isOpen: isLeaveModalOpen,
+    onOpen: onOpenLeaveModal,
+    onOpenChange: onLeaveModalOpenChange,
+    onClose: onLeaveModalClose,
+  } = useDisclosure();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const leaveClassroomMutation = useMutation({
+    mutationFn: () =>
+      axios.post<IResponseData<unknown>>(
+        `/api/v1/classrooms/leave/${classroom?.id}`
+      ),
+    onError,
+    onSuccess: (data) => {
+      toast.success(data.data.message || "Left classroom.");
+      onLeaveModalClose();
+      queryClient.invalidateQueries(["fetch/classrooms/teaching"]);
+      queryClient.invalidateQueries(["fetch/classrooms/registered"]);
+      navigate("/");
+    },
+  });
   return (
     <>
+      <Modal isOpen={isLeaveModalOpen} onOpenChange={onLeaveModalOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Confirm</ModalHeader>
+              <ModalBody>
+                <div>Are you sure you want to leave this classroom.</div>
+                <div>
+                  <strong>
+                    You will no longer be enable to access to resources in this
+                    class.
+                  </strong>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  isLoading={leaveClassroomMutation.isLoading}
+                  color="primary"
+                  variant="light"
+                  onPress={onClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  isLoading={leaveClassroomMutation.isLoading}
+                  color="danger"
+                  onPress={() => {
+                    leaveClassroomMutation.mutate();
+                  }}
+                >
+                  Leave
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       {getClassroomQuery.isLoading ? (
         <div className="w-full h-full flex items-center justify-center">
           <Spinner size="lg" />
@@ -60,7 +142,7 @@ export default function ClassroomPage() {
                     <AiOutlineFolderOpen size={18} />
                   </Button>
                 </Tooltip>
-                {isOwner && (
+                {isOwner ? (
                   <Tooltip content="Setting">
                     <Button
                       onClick={() => setOpenSetting(true)}
@@ -71,9 +153,29 @@ export default function ClassroomPage() {
                       <AiOutlineSetting size={18} />
                     </Button>
                   </Tooltip>
+                ) : (
+                  <Tooltip content="Leave">
+                    <Button
+                      onClick={() => onOpenLeaveModal()}
+                      isIconOnly
+                      radius="full"
+                      variant="light"
+                    >
+                      <IoExitOutline size={18} />
+                    </Button>
+                  </Tooltip>
                 )}
               </div>
               <Tabs
+                selectedKey={tab}
+                onSelectionChange={(key) => {
+                  if (key == "feed") {
+                    searchParams.delete("tab");
+                  } else {
+                    searchParams.set("tab", key.toString());
+                  }
+                  setSearchParams(searchParams);
+                }}
                 color="primary"
                 variant="underlined"
                 className="w-full"

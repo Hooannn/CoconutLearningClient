@@ -4,3 +4,21 @@
 .ps-sidebar-container {
     overflow: visible !important;
 }
+
+.ql-editor {
+    min-height: 100px;
+}
+
+.ql-toolbar.ql-snow {
+    border-top-right-radius: 12px !important;
+    border-top-left-radius: 12px !important;
+}
+.ql-container.ql-snow {
+    border-bottom-right-radius: 12px !important;
+    border-bottom-left-radius: 12px !important;
+}
+
+
+.readonly .ql-container.ql-snow {
+    border: none;
+}

@@ -9,7 +9,7 @@ import {
   Skeleton,
   User,
 } from "@nextui-org/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { IResponseData, IUser } from "../../types";
@@ -20,17 +20,22 @@ import {
   AiOutlineClose,
   AiOutlineUser,
 } from "react-icons/ai";
+import toast from "react-hot-toast";
+import { onError } from "../../utils/error-handlers";
+import { Classroom } from "../../types/classroom";
 export enum InviteType {
-  PROVIDER,
-  USER,
+  PROVIDER = "PROVIDER",
+  USER = "USER",
 }
 let typingTimeout: NodeJS.Timeout | null = null;
 export default function InviteModal(props: {
   isOpen: boolean;
   onClose: () => void;
   type: InviteType;
+  classroom: Classroom;
 }) {
   const axios = useAxiosIns();
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const debouncedQuery = useDebounce(query, 500);
@@ -46,9 +51,42 @@ export default function InviteModal(props: {
             params: { q: debouncedQuery },
           }
         );
-      else return null;
+      return null;
     },
     refetchOnWindowFocus: false,
+    onSuccess: (data) => {
+      if (
+        data?.data?.data.length == 0 &&
+        debouncedQuery.match("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+      ) {
+        data.data.data = [
+          { id: debouncedQuery, email: debouncedQuery } as never,
+        ];
+      } else if (data?.data.data.length) {
+        data.data.data = data.data.data.filter(
+          (u) =>
+            !props.classroom.invitations.map((i) => i.email).includes(u.email)
+        );
+      }
+    },
+  });
+
+  const inviteMutation = useMutation({
+    mutationFn: (params: {
+      emails: string[];
+      class_id: string;
+      type: InviteType;
+    }) =>
+      axios.post<IResponseData<unknown>>(
+        `/api/v1/classrooms/invite/many`,
+        params
+      ),
+    onSuccess: (data) => {
+      toast.success(data.data?.message || "Invited successfully");
+      queryClient.invalidateQueries(["fetch/classroom/id", props.classroom.id]);
+      props.onClose();
+    },
+    onError,
   });
 
   const onSearchInputChange = (v: string) => {
@@ -68,6 +106,15 @@ export default function InviteModal(props: {
   const isSelected = (userId: string) =>
     selectedUsers.some((u) => u.id === userId);
 
+  const invite = () => {
+    const emails = selectedUsers.map((u) => u.email);
+    inviteMutation.mutate({
+      emails,
+      class_id: props.classroom.id,
+      type: props.type,
+    });
+  };
+
   const topContent = useMemo(() => {
     if (!selectedUsers.length) {
       return null;
@@ -81,7 +128,11 @@ export default function InviteModal(props: {
             className="text-small flex items-center gap-1 bg-sky-100 rounded-full px-2 py-1"
           >
             <User
-              name={user.first_name + " " + user.last_name}
+              name={
+                user.first_name && user.last_name
+                  ? user.first_name + " " + user.last_name
+                  : user.email
+              }
               avatarProps={{
                 src: user.avatar_url,
                 fallback: (
@@ -111,7 +162,7 @@ export default function InviteModal(props: {
         ))}
       </div>
     );
-  }, [selectedUsers.length]);
+  }, [selectedUsers]);
   return (
     <Modal isOpen={props.isOpen} onClose={props.onClose}>
       <ModalContent>
@@ -136,7 +187,7 @@ export default function InviteModal(props: {
                 <div className="flex flex-col gap-2 py-2">
                   {Array(4)
                     .fill(null)
-                    .map((i, a) => (
+                    .map((_, a) => (
                       <Skeleton
                         key={"Skeletonss::" + a}
                         className="rounded-lg w-full"
@@ -181,8 +232,16 @@ export default function InviteModal(props: {
                                 showFallback: true,
                               }}
                               className="transition-transform"
-                              description={user?.email}
-                              name={user?.first_name + " " + user?.last_name}
+                              description={
+                                user?.first_name && user?.last_name
+                                  ? user?.email
+                                  : null
+                              }
+                              name={
+                                user?.first_name && user?.last_name
+                                  ? user?.first_name + " " + user?.last_name
+                                  : user.email
+                              }
                             />
                             {isSelected(user.id) && (
                               <AiFillCheckCircle
@@ -221,10 +280,21 @@ export default function InviteModal(props: {
               )}
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button
+                isLoading={inviteMutation.isLoading}
+                color="danger"
+                variant="light"
+                onPress={onClose}
+              >
                 Close
               </Button>
-              <Button color="primary">Invite</Button>
+              <Button
+                isLoading={inviteMutation.isLoading}
+                onClick={invite}
+                color="primary"
+              >
+                Invite
+              </Button>
             </ModalFooter>
           </>
         )}
