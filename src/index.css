@@ -9,6 +9,23 @@
     min-height: 100px;
 }
 
+.readonly .ql-editor {
+    min-height: fit-content;
+}
+
+.comment .ql-editor {
+    min-height: 70px;
+}
+
+.comment .ql-snow {
+    border-color: #0070F0 !important;
+    border-width: 2px !important;
+}
+
+.comment .ql-toolbar.ql-snow {
+    border-bottom-color: transparent !important;;
+}
+
 .ql-toolbar.ql-snow {
     border-top-right-radius: 12px !important;
     border-top-left-radius: 12px !important;
@@ -21,4 +38,8 @@
 
 .readonly .ql-container.ql-snow {
     border: none;
+}
+
+.readonly .ql-editor {
+    padding: 0;
 }
