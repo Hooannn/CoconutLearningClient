@@ -23,6 +23,8 @@ import toast from "react-hot-toast";
 import { onError } from "../../utils/error-handlers";
 import { Classroom } from "../../types/classroom";
 import useAxiosIns from "../../hooks/useAxiosIns";
+import { useMemo, useRef, useState } from "react";
+import { formats, modules } from "../../configs/quill";
 
 export default function CommentCard(props: {
   comment: Comment;
@@ -31,17 +33,34 @@ export default function CommentCard(props: {
   const axios = useAxiosIns();
   const { user } = useAuthStore();
   const author = props.comment.author;
+  const quillRef = useRef<ReactQuill>(null);
   const isOwner = user?.id === author.id;
   const queryClient = useQueryClient();
   const deleteCommentMutation = useMutation({
     mutationFn: () =>
       axios.delete<IResponseData<unknown>>(
-        `/api/v1/comments/${props.comment.id}`
+        `/api/v1/comments/${props.classroom.id}/${props.comment.id}`
       ),
     onError,
     onSuccess: (data) => {
       toast.success(data.data.message || "Deleted successfully");
       onDeleteModalClose();
+      queryClient.invalidateQueries([
+        "fetch/posts/classroom",
+        props.classroom.id,
+      ]);
+    },
+  });
+
+  const updateCommentMutation = useMutation({
+    mutationFn: (params: { body: string; classroom_id: string }) =>
+      axios.put<IResponseData<unknown>>(
+        `/api/v1/comments/${props.comment.id}`,
+        params
+      ),
+    onError,
+    onSuccess: (data) => {
+      toast.success(data.data.message || "Updated successfully");
       queryClient.invalidateQueries([
         "fetch/posts/classroom",
         props.classroom.id,
@@ -55,6 +74,26 @@ export default function CommentCard(props: {
     onOpenChange: onDeleteModalOpenChange,
     onClose: onDeleteModalClose,
   } = useDisclosure();
+
+  const [body, setBody] = useState(props.comment.body);
+
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const bodyInnerTextLength = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const innerText = (quillRef?.current?.editingArea as any)?.innerText;
+    const replaceBreak = (innerText as string)?.replace("\n", "");
+    const length = replaceBreak?.trim().length;
+    return length;
+  }, [body]);
+
+  const save = async () => {
+    await updateCommentMutation.mutateAsync({
+      body,
+      classroom_id: props.classroom.id,
+    });
+    setIsUpdating(false);
+  };
   return (
     <>
       <Modal isOpen={isDeleteModalOpen} onOpenChange={onDeleteModalOpenChange}>
@@ -111,28 +150,69 @@ export default function CommentCard(props: {
                 {dayjs(props.comment.created_at).fromNow()}
               </div>
             </div>
-            <div className="text-wrap">
-              <ReactQuill
-                className="readonly"
-                value={props.comment.body}
-                formats={[
-                  "header",
-                  "bold",
-                  "italic",
-                  "underline",
-                  "strike",
-                  "blockquote",
-                  "code-block",
-                  "list",
-                  "bullet",
-                  "indent",
-                  "link",
-                  "image",
-                ]}
-                readOnly={true}
-                theme={"snow"}
-                modules={{ toolbar: false }}
-              ></ReactQuill>
+            <div className="w-full">
+              {isUpdating ? (
+                <div className="mt-3">
+                  <ReactQuill
+                    ref={quillRef}
+                    className={`update-comment transition`}
+                    placeholder="Add comment to class..."
+                    theme="snow"
+                    modules={modules}
+                    formats={formats}
+                    value={body}
+                    onChange={(e) => {
+                      setBody(e);
+                    }}
+                  />
+                  <div className="mt-3 flex items-center gap-2">
+                    <Button
+                      onClick={() => {
+                        setIsUpdating(false);
+                        setBody(props.comment.body);
+                      }}
+                      variant="light"
+                      isLoading={updateCommentMutation.isLoading}
+                      size="sm"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      isDisabled={
+                        bodyInnerTextLength === 0 || body === props.comment.body
+                      }
+                      onClick={save}
+                      isLoading={updateCommentMutation.isLoading}
+                      size="sm"
+                      color="primary"
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <ReactQuill
+                  className="readonly"
+                  value={props.comment.body}
+                  formats={[
+                    "header",
+                    "bold",
+                    "italic",
+                    "underline",
+                    "strike",
+                    "blockquote",
+                    "code-block",
+                    "list",
+                    "bullet",
+                    "indent",
+                    "link",
+                    "image",
+                  ]}
+                  readOnly={true}
+                  theme={"snow"}
+                  modules={{ toolbar: false }}
+                ></ReactQuill>
+              )}
             </div>
           </div>
         </div>
@@ -145,7 +225,13 @@ export default function CommentCard(props: {
               </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="Post action" variant="flat">
-              <DropdownItem onClick={() => {}} className="py-2" key="edit_post">
+              <DropdownItem
+                onClick={() => {
+                  setIsUpdating(true);
+                }}
+                className="py-2"
+                key="edit_post"
+              >
                 Edit
               </DropdownItem>
               <DropdownItem

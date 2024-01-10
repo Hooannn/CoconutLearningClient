@@ -6,9 +6,10 @@ export interface Base {
 export interface File extends Base {
   id: string;
   name: string;
-  eTag: string;
+  e_tag: string;
   size: number;
   creator: IUser;
+  content_type: string;
 }
 
 export interface Post extends Base {

@@ -13,6 +13,7 @@
     min-height: fit-content;
 }
 
+.update-comment .ql-editor,
 .comment .ql-editor {
     min-height: 70px;
 }
@@ -35,7 +36,8 @@
     border-bottom-left-radius: 12px !important;
 }
 
-
+.edit-post .ql-toolbar.ql-snow,
+.edit-post .ql-container.ql-snow,
 .readonly .ql-container.ql-snow {
     border: none;
 }

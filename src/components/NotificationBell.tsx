@@ -82,7 +82,7 @@ export default function NotificationBell() {
             <>
               {Array(4)
                 .fill(null)
-                .map((i) => (
+                .map((_, i) => (
                   <Skeleton
                     key={"Skeleton::" + i}
                     className="rounded-lg w-full"

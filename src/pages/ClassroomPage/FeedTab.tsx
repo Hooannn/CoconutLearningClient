@@ -18,7 +18,7 @@ import { GrPowerReset } from "react-icons/gr";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { onError } from "../../utils/error-handlers";
-import { IResponseData, Post } from "../../types";
+import { File, IResponseData, Post } from "../../types";
 import useAuthStore from "../../stores/auth";
 import { AiOutlineUser } from "react-icons/ai";
 import SVG1 from "../../components/SVG1";
@@ -27,6 +27,7 @@ import ReactQuill from "react-quill";
 import { formats, modules } from "../../configs/quill";
 import PostCard from "./PostCard";
 import UserFolder from "../../components/UserFolder";
+import FileCard from "../../components/FileCard";
 
 export default function FeedTab(props: {
   classroom: Classroom;
@@ -81,13 +82,16 @@ export default function FeedTab(props: {
   const cancelPost = () => {
     setBody("");
     setIsPosting(false);
+    setSelectedFiles([]);
   };
 
   const post = async () => {
     await postMutation.mutateAsync({
       classroom_id: props.classroom.id,
       body,
-      file_ids: [],
+      file_ids: selectedFiles.length
+        ? selectedFiles.map((file) => file.id)
+        : [],
     });
     cancelPost();
   };
@@ -98,9 +102,26 @@ export default function FeedTab(props: {
     onClose: onFolderClose,
   } = useDisclosure();
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  const onFilesSelected = (files: File[]) => {
+    const newFiles = [...selectedFiles, ...files];
+    const _files: File[] = [];
+
+    newFiles.forEach((file) => {
+      if (!_files.some((f) => f.id === file.id)) _files.push(file);
+    });
+
+    setSelectedFiles(_files);
+  };
+
   return (
     <>
-      <UserFolder isOpen={isFolderOpen} onClose={onFolderClose} />
+      <UserFolder
+        onSelect={onFilesSelected}
+        isOpen={isFolderOpen}
+        onClose={onFolderClose}
+      />
       <div className="flex flex-col gap-4 items-center max-w-[980px] mx-auto">
         <Card className="w-full h-[250px]" shadow="sm">
           <CardHeader className="absolute z-10 top-1 flex-col items-start justify-end h-full p-5">
@@ -192,6 +213,24 @@ export default function FeedTab(props: {
                         setBody(e);
                       }}
                     />
+                    {selectedFiles.length > 0 && (
+                      <div className="w-full flex items-center flex-wrap gap-4 mt-3">
+                        {selectedFiles.map((file, index) => (
+                          <FileCard
+                            showCloseButton
+                            onClose={(file) => {
+                              const newFiles = selectedFiles.filter(
+                                (f) => f.id !== file.id
+                              );
+                              setSelectedFiles(newFiles);
+                            }}
+                            file={file}
+                            isSelected={false}
+                            key={file.id + index}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center justify-between px-3">
                     <Tooltip content="Upload files">
@@ -261,7 +300,7 @@ export default function FeedTab(props: {
               <div className="flex flex-col gap-4">
                 {Array(3)
                   .fill(null)
-                  .map((i) => (
+                  .map((_, i) => (
                     <Skeleton
                       key={"Skeleton:ss:" + i}
                       className="rounded-lg w-full"

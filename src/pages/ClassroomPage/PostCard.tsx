@@ -32,6 +32,8 @@ import { onError } from "../../utils/error-handlers";
 import { Classroom } from "../../types/classroom";
 import toast from "react-hot-toast";
 import CommentCard from "./CommentCard";
+import FileCard from "../../components/FileCard";
+import EditPost from "./EditPost";
 export default function PostCard(props: { post: Post; classroom: Classroom }) {
   const { user } = useAuthStore();
   const author = props.post.author;
@@ -86,7 +88,9 @@ export default function PostCard(props: { post: Post; classroom: Classroom }) {
 
   const deletePostMutation = useMutation({
     mutationFn: () =>
-      axios.delete<IResponseData<unknown>>(`/api/v1/posts/${props.post.id}`),
+      axios.delete<IResponseData<unknown>>(
+        `/api/v1/posts/${props.classroom.id}/${props.post.id}`
+      ),
     onError,
     onSuccess: (data) => {
       toast.success(data.data.message || "Deleted successfully");
@@ -105,8 +109,20 @@ export default function PostCard(props: { post: Post; classroom: Classroom }) {
     onClose: onDeleteModalClose,
   } = useDisclosure();
 
+  const {
+    onOpen: onOpenEditPost,
+    isOpen: isEditPostOpen,
+    onClose: onEditPostClose,
+  } = useDisclosure();
+
   return (
     <>
+      <EditPost
+        classroom={props.classroom}
+        post={props.post}
+        isOpen={isEditPostOpen}
+        onClose={onEditPostClose}
+      />
       <Modal isOpen={isDeleteModalOpen} onOpenChange={onDeleteModalOpenChange}>
         <ModalContent>
           {(onClose) => (
@@ -168,7 +184,7 @@ export default function PostCard(props: { post: Post; classroom: Classroom }) {
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Post action" variant="flat">
                   <DropdownItem
-                    onClick={() => {}}
+                    onClick={onOpenEditPost}
                     className="py-2"
                     key="edit_post"
                   >
@@ -208,6 +224,23 @@ export default function PostCard(props: { post: Post; classroom: Classroom }) {
               theme={"snow"}
               modules={{ toolbar: false }}
             ></ReactQuill>
+            {props.post.files.length > 0 && (
+              <div className="flex items-center w-full flex-wrap gap-4 mt-3">
+                {props.post.files.map((file) => (
+                  <FileCard
+                    isSelected={false}
+                    onClick={(file) => {
+                      const fileHost = import.meta.env.VITE_FILE_HOST;
+                      const fileUrl = `${fileHost}/${file.id}`;
+                      window.open(fileUrl, "_blank");
+                    }}
+                    key={file.id}
+                    file={file}
+                    showCloseButton={false}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           <Divider className="mt-2" />
