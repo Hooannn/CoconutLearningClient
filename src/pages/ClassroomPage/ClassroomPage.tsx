@@ -207,7 +207,11 @@ export default function ClassroomPage() {
                     </div>
                   }
                 >
-                  <ClassworkTab />
+                  <ClassworkTab
+                    isOwner={isOwner}
+                    isProvider={isProvider}
+                    classroom={classroom}
+                  />
                 </Tab>
                 <Tab
                   key="members"

@@ -3,9 +3,11 @@ import { useSocket } from "../contexts/SocketContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosIns from "../hooks/useAxiosIns";
 import { GetQuery, IResponseData, Notification } from "../types";
+import { useLocation } from "react-router-dom";
 
 const useNotifications = () => {
   const axios = useAxiosIns();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState<GetQuery>({
     offset: 0,
@@ -72,10 +74,43 @@ const useNotifications = () => {
       socket.on("notification:created", () => {
         invalidateQueries();
       });
+
+      socket.on(
+        "classroom:updated",
+        (data: { type: ClassroomUpdateType; classroom_id: string }) => {
+          if (location.pathname.includes(`/classroom/${data.classroom_id}`)) {
+            if (
+              [
+                ClassroomUpdateType.CLASSROOM,
+                ClassroomUpdateType.MEMBER,
+              ].includes(data.type)
+            )
+              queryClient.invalidateQueries([
+                "fetch/classroom/id",
+                data.classroom_id,
+              ]);
+            if (
+              [ClassroomUpdateType.POST, ClassroomUpdateType.COMMENT].includes(
+                data.type
+              )
+            )
+              queryClient.invalidateQueries([
+                "fetch/posts/classroom",
+                data.classroom_id,
+              ]);
+          }
+
+          if ([ClassroomUpdateType.CLASSROOM].includes(data.type)) {
+            queryClient.invalidateQueries(["fetch/classrooms/teaching"]);
+            queryClient.invalidateQueries(["fetch/classrooms/registered"]);
+          }
+        }
+      );
     }
 
     return () => {
       socket?.removeListener("notification:created");
+      socket?.removeListener("classroom:updated");
     };
   }, [socket]);
 
@@ -89,5 +124,13 @@ const useNotifications = () => {
     deleteAllMutation,
   };
 };
+
+enum ClassroomUpdateType {
+  CLASSROOM = "CLASSROOM",
+  CLASSWORK = "CLASSWORK",
+  POST = "POST",
+  COMMENT = "COMMENT",
+  MEMBER = "MEMBER",
+}
 
 export default useNotifications;

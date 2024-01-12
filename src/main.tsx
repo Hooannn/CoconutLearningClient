@@ -9,7 +9,6 @@ import { Toaster } from "react-hot-toast";
 import { FirebaseOptions } from "firebase/app";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { NextUIProvider } from "@nextui-org/react";
-
 const GG_CLIENT_ID = import.meta.env.VITE_GG_CLIENT_ID;
 const queryClient = new QueryClient();
 

@@ -17,6 +17,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { onError } from "../utils/error-handlers";
 import toast from "react-hot-toast";
 import { AiOutlineClose, AiOutlineUpload } from "react-icons/ai";
+import SVG2 from "./SVG2";
 
 export default function UserFolder(props: {
   isOpen: boolean;
@@ -117,6 +118,7 @@ export default function UserFolder(props: {
       <Modal
         size="5xl"
         className="h-[80dvh]"
+        isDismissable={false}
         isOpen={props.isOpen}
         onClose={props.onClose}
       >
@@ -141,17 +143,30 @@ export default function UserFolder(props: {
                         ))}
                     </div>
                   ) : (
-                    <div className="flex flex-wrap gap-4">
-                      {files.map((file) => (
-                        <FileCard
-                          showCloseButton={false}
-                          onClick={onFileCardClicked}
-                          isSelected={isSelected(file)}
-                          key={file.id}
-                          file={file}
-                        />
-                      ))}
-                    </div>
+                    <>
+                      {files.length > 0 ? (
+                        <div className="flex flex-wrap gap-4">
+                          {files.map((file) => (
+                            <FileCard
+                              showCloseButton={false}
+                              onClick={onFileCardClicked}
+                              isSelected={isSelected(file)}
+                              key={file.id}
+                              file={file}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full">
+                          <div className="w-1/4">
+                            <SVG2 />
+                          </div>
+                          <small className="text-xs mt-4">
+                            Start uploading your files.
+                          </small>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </ModalBody>

@@ -199,7 +199,7 @@ export default function FeedTab(props: {
           </div>
           <div className="flex flex-col gap-4 w-3/4">
             {isPosting ? (
-              <Card>
+              <Card shadow="sm">
                 <CardBody>
                   <div className="p-3">
                     <ReactQuill
