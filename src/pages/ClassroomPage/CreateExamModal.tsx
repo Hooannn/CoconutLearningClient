@@ -15,7 +15,13 @@ import {
 } from "@nextui-org/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { ClassworkCategory, File, IResponseData, IUser } from "../../types";
+import {
+  ClassworkCategory,
+  ClassworkType,
+  File,
+  IResponseData,
+  IUser,
+} from "../../types";
 import { onError } from "../../utils/error-handlers";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { Classroom } from "../../types/classroom";
@@ -42,9 +48,19 @@ export default function CreateExamModal(props: {
   const queryClient = useQueryClient();
 
   const createClassworkMutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (params: {
+      title: string;
+      description?: string;
+      type: ClassworkType;
+      score?: number;
+      deadline?: string;
+      assignee_ids: string[];
+      file_ids: string[];
+      category_id?: string;
+    }) =>
       axios.post<IResponseData<unknown>>(
-        `/api/v1/classwork/${props.classroom.id}`
+        `/api/v1/classwork/${props.classroom.id}`,
+        params
       ),
     onError,
     onSuccess(data) {
@@ -55,11 +71,6 @@ export default function CreateExamModal(props: {
       ]);
     },
   });
-
-  const create = async () => {
-    await createClassworkMutation.mutateAsync();
-    props.onClose();
-  };
 
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
@@ -104,12 +115,50 @@ export default function CreateExamModal(props: {
     setDate(newValue);
   };
 
-  const [assignees, setAssignees] = useState<string[]>(["ALL"]);
+  const [assignees, setAssignees] = useState<string[]>([
+    "ALL",
+    ...props.classroom.users.map((user) => user.id),
+  ]);
+
+  const [category, setCategory] = useState<string>();
 
   const [time, setTime] = useState("");
 
   const isValidTime = () => dayjs(time, "HH:mm", true).isValid();
 
+  const create = async () => {
+    if (!isValidTime) {
+      toast.error("Invalid time");
+      return;
+    }
+    if (assignees.filter((a) => a !== "ALL").length === 0) {
+      toast.error("Assignees must have at least one");
+      return;
+    }
+    if (title.length === 0 || title.trim().length === 0) {
+      toast.error("Title must not be empty");
+      return;
+    }
+    const deadline = `${date?.startDate} ${time}`.trim();
+    let parse;
+    try {
+      parse = dayjs(deadline).toISOString();
+    } catch (error) {
+      parse = undefined;
+    }
+
+    await createClassworkMutation.mutateAsync({
+      title,
+      description,
+      type: ClassworkType.EXAM,
+      score: parseInt(score),
+      deadline: parse,
+      assignee_ids: assignees.filter((a) => a !== "ALL"),
+      file_ids: selectedFiles.map((f) => f.id),
+      category_id: category,
+    });
+    props.onClose();
+  };
   return (
     <>
       <UserFolder
@@ -239,12 +288,37 @@ export default function CreateExamModal(props: {
                               const newKey = keys.filter(
                                 (key) => !assignees.includes(key)
                               );
-
-                              if (newKey.length == 0) {
-                                //element added
+                              if (newKey.length > 0) {
                                 const key = newKey[0];
+                                if (key === "ALL") {
+                                  setAssignees([
+                                    "ALL",
+                                    ...props.classroom.users.map((u) => u.id),
+                                  ]);
+                                  return;
+                                }
+                                const keysWithOutAll = keys.filter(
+                                  (key) => key !== "ALL"
+                                );
+                                if (
+                                  keysWithOutAll.length ===
+                                  props.classroom.users.length
+                                ) {
+                                  setAssignees(["ALL", ...keysWithOutAll]);
+                                  return;
+                                }
                               } else {
-                                //element removed
+                                const deletedKey = assignees.filter(
+                                  (key) => !keys.includes(key)
+                                )[0];
+                                if (deletedKey === "ALL") return;
+                                else {
+                                  const _keys = keys.filter(
+                                    (key) => key !== "ALL"
+                                  );
+                                  setAssignees(_keys);
+                                  return;
+                                }
                               }
 
                               setAssignees(keys);
@@ -252,36 +326,110 @@ export default function CreateExamModal(props: {
                             renderValue={(items) => {
                               return (
                                 <div className="flex items-center gap-2 w-full overflow-hidden">
-                                  {items.map((item) => (
-                                    <div className="flex gap-2 items-center">
-                                      <Avatar
-                                        alt={
-                                          getUser(item?.key?.toString())
-                                            ?.first_name +
-                                          " " +
-                                          getUser(item?.key?.toString())
-                                            ?.last_name
-                                        }
-                                        className="flex-shrink-0"
-                                        src={
-                                          getUser(item?.key?.toString())
-                                            ?.avatar_url
-                                        }
-                                        showFallback
-                                        fallback={
-                                          <AiOutlineUser
-                                            className="w-6 h-6 text-default-500"
-                                            fill="currentColor"
-                                            size={20}
+                                  {items.map((u) => u.key).includes("ALL") ? (
+                                    <>
+                                      <div className="flex gap-2 items-center">
+                                        <Avatar
+                                          alt={
+                                            getUser(
+                                              items
+                                                .find((i) => i.key === "ALL")
+                                                ?.key?.toString()
+                                            )?.first_name +
+                                            " " +
+                                            getUser(
+                                              items
+                                                .find((i) => i.key === "ALL")
+                                                ?.key?.toString()
+                                            )?.last_name
+                                          }
+                                          className="flex-shrink-0"
+                                          src={
+                                            getUser(
+                                              items
+                                                .find((i) => i.key === "ALL")
+                                                ?.key?.toString()
+                                            )?.avatar_url
+                                          }
+                                          showFallback
+                                          fallback={
+                                            <AiOutlineUser
+                                              className="w-6 h-6 text-default-500"
+                                              fill="currentColor"
+                                              size={20}
+                                            />
+                                          }
+                                        />
+                                        <div className="flex flex-col">
+                                          <span className="text-small">
+                                            {`${
+                                              getUser(
+                                                items
+                                                  .find((i) => i.key === "ALL")
+                                                  ?.key?.toString()
+                                              )?.first_name
+                                            } 
+                                            ${
+                                              getUser(
+                                                items
+                                                  .find((i) => i.key === "ALL")
+                                                  ?.key?.toString()
+                                              )?.last_name
+                                                ? " " +
+                                                  getUser(
+                                                    items
+                                                      .find(
+                                                        (i) => i.key === "ALL"
+                                                      )
+                                                      ?.key?.toString()
+                                                  )?.last_name
+                                                : ""
+                                            }`}
+                                          </span>
+                                          <span className="text-tiny text-default-400">
+                                            {
+                                              getUser(
+                                                items
+                                                  .find((i) => i.key === "ALL")
+                                                  ?.key?.toString()
+                                              )?.email
+                                            }
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      {items.map((item) => (
+                                        <div className="flex gap-2 items-center">
+                                          <Avatar
+                                            alt={
+                                              getUser(item?.key?.toString())
+                                                ?.first_name +
+                                              " " +
+                                              getUser(item?.key?.toString())
+                                                ?.last_name
+                                            }
+                                            className="flex-shrink-0"
+                                            src={
+                                              getUser(item?.key?.toString())
+                                                ?.avatar_url
+                                            }
+                                            showFallback
+                                            fallback={
+                                              <AiOutlineUser
+                                                className="w-6 h-6 text-default-500"
+                                                fill="currentColor"
+                                                size={20}
+                                              />
+                                            }
                                           />
-                                        }
-                                      />
-                                      <div className="flex flex-col">
-                                        <span className="text-small">
-                                          {`${
-                                            getUser(item?.key?.toString())
-                                              ?.first_name
-                                          } 
+                                          <div className="flex flex-col">
+                                            <span className="text-small">
+                                              {`${
+                                                getUser(item?.key?.toString())
+                                                  ?.first_name
+                                              } 
                                             ${
                                               getUser(item?.key?.toString())
                                                 ?.last_name
@@ -290,16 +438,18 @@ export default function CreateExamModal(props: {
                                                     ?.last_name
                                                 : ""
                                             }`}
-                                        </span>
-                                        <span className="text-tiny text-default-400">
-                                          {
-                                            getUser(item?.key?.toString())
-                                              ?.email
-                                          }
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ))}
+                                            </span>
+                                            <span className="text-tiny text-default-400">
+                                              {
+                                                getUser(item?.key?.toString())
+                                                  ?.email
+                                              }
+                                            </span>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </>
+                                  )}
                                 </div>
                               );
                             }}
@@ -393,6 +543,10 @@ export default function CreateExamModal(props: {
                           <Select
                             items={props.classworkCategories}
                             placeholder="Select a category"
+                            onSelectionChange={(selection) => {
+                              const keys = Array.from(selection) as string[];
+                              setCategory(keys[0]?.toString() ?? "");
+                            }}
                           >
                             {(category) => (
                               <SelectItem key={category.id} value={category.id}>

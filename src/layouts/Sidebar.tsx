@@ -89,6 +89,7 @@ export default function Sidebar() {
             ))}
             <Divider></Divider>
             <SubMenu
+              defaultOpen
               className="text-sm"
               icon={<FiUsers size={20} />}
               label="Teaching"
@@ -131,6 +132,7 @@ export default function Sidebar() {
             </SubMenu>
             <Divider></Divider>
             <SubMenu
+              defaultOpen
               className="text-sm"
               icon={<RiGraduationCapLine size={20} />}
               label="Registered"
