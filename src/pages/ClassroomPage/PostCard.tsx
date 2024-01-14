@@ -65,7 +65,7 @@ export default function PostCard(props: { post: Post; classroom: Classroom }) {
       body: string;
       classroom_id: string;
       post_id: string;
-    }) => axios.post<IResponseData<Comment>>(`/api/v1/comments`, params),
+    }) => axios.post<IResponseData<Comment>>(`/api/v1/comments/post`, params),
     onError,
     onSuccess(data) {
       toast.success(data.data?.message || "Commented successfully");

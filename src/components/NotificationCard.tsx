@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useAxiosIns from "../hooks/useAxiosIns";
 import { onError } from "../utils/error-handlers";
 import toast from "react-hot-toast";
+import dayjs from "../libs/dayjs";
 export default function NotificationCard(props: {
   notification: Notification;
   notificationDidPress: (n_id: string) => void;
@@ -55,6 +56,9 @@ export default function NotificationCard(props: {
             <div className="flex flex-col max-w-[240px]">
               <div className="font-bold">{props.notification.title}</div>
               <div className="text-xs">{props.notification.content}</div>
+              <small className="opacity-60">
+                {dayjs(props.notification.created_at).fromNow()}
+              </small>
             </div>
           </div>
           {!props.notification.read && (

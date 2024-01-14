@@ -6,6 +6,7 @@ import MainLayout from "../layouts/MainLayout";
 import Global from "../Global";
 import ClassroomPage from "../pages/ClassroomPage";
 import CalendarPage from "../pages/CalendarPage";
+import ClassworkPage from "../pages/ClassworkPage";
 const rootRouter = [
   {
     path: "/",
@@ -38,6 +39,10 @@ const rootRouter = [
       {
         path: "/classroom/:classroomId",
         element: <ClassroomPage />,
+      },
+      {
+        path: "/classroom/:classroomId/classwork/:classworkId",
+        element: <ClassworkPage />,
       },
     ],
     errorElement: <ErrorPage />,

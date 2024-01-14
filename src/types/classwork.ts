@@ -1,4 +1,4 @@
-import { Base, File, IUser } from ".";
+import { Base, Comment, File, IUser } from ".";
 export enum ClassworkType {
   EXAM = "EXAM",
   LAB = "LAB",
@@ -16,6 +16,7 @@ export interface Classwork extends Base {
   files: File[];
   category?: ClassworkCategory;
   author: IUser;
+  comments: Comment[];
 }
 
 export interface ClassworkCategory {

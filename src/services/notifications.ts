@@ -98,6 +98,17 @@ const useNotifications = () => {
                 "fetch/posts/classroom",
                 data.classroom_id,
               ]);
+
+            if ([ClassroomUpdateType.CLASSWORK].includes(data.type)) {
+              queryClient.invalidateQueries([
+                "fetch/classworks/classroom",
+                data.classroom_id,
+              ]);
+              queryClient.invalidateQueries([
+                "fetch/classwork_categories/classroom",
+                data.classroom_id,
+              ]);
+            }
           }
 
           if ([ClassroomUpdateType.CLASSROOM].includes(data.type)) {

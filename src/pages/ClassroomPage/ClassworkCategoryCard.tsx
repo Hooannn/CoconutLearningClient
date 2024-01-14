@@ -18,9 +18,7 @@ import { FaEllipsisVertical } from "react-icons/fa6";
 import SVG3 from "../../components/SVG3";
 import EditCategoryModal from "./EditCategoryModal";
 import DeleteCategoryModal from "./DeleteCategoryModal";
-import ClassworkCard from "./ClassworkCard";
-import { AiOutlineFileText } from "react-icons/ai";
-import dayjs from "../../libs/dayjs";
+import ClassworkCard, { ClassworkCardTitle } from "./ClassworkCard";
 
 export default function ClassworkCategoryCard(props: {
   classworkCategory: ClassworkCategory;
@@ -98,62 +96,11 @@ export default function ClassworkCategoryCard(props: {
                     key={i}
                     hideIndicator
                     title={
-                      <div className="flex items-center justify-between text-base">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            isIconOnly
-                            className="opacity-100"
-                            color="primary"
-                            size="sm"
-                            isDisabled
-                            radius="full"
-                          >
-                            <AiOutlineFileText size={18} />
-                          </Button>
-                          <div>{classwork.title}</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <small className="opacity-60">
-                            {classwork.deadline
-                              ? dayjs(classwork.deadline).fromNow()
-                              : "No deadline"}
-                          </small>
-                          {props.isProvider && (
-                            <Dropdown placement="left-end">
-                              <DropdownTrigger>
-                                <Button
-                                  radius="full"
-                                  isIconOnly
-                                  variant="light"
-                                >
-                                  <FaEllipsisVertical
-                                    size={14}
-                                    className="opacity-70"
-                                  />
-                                </Button>
-                              </DropdownTrigger>
-                              <DropdownMenu
-                                aria-label="Post action"
-                                variant="flat"
-                              >
-                                <DropdownItem
-                                  className="py-2"
-                                  key="edit_classwork"
-                                >
-                                  Edit
-                                </DropdownItem>
-                                <DropdownItem
-                                  color="danger"
-                                  className="py-2"
-                                  key="delete_classwork"
-                                >
-                                  Delete
-                                </DropdownItem>
-                              </DropdownMenu>
-                            </Dropdown>
-                          )}
-                        </div>
-                      </div>
+                      <ClassworkCardTitle
+                        classroom={props.classroom}
+                        classwork={classwork}
+                        isProvider={props.isProvider}
+                      />
                     }
                   >
                     <ClassworkCard

@@ -1,4 +1,6 @@
-export interface Notification {
+import { Base } from ".";
+
+export interface Notification extends Base {
   id: string;
   title: string;
   content?: string;

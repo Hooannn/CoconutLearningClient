@@ -104,7 +104,9 @@ export default function Sidebar() {
               {teachingClassrooms.map((classroom) => (
                 <MenuItem
                   key={classroom.id}
-                  active={location.pathname === `/classroom/${classroom.id}`}
+                  active={location.pathname.includes(
+                    `/classroom/${classroom.id}`
+                  )}
                   onClick={() => navigate(`/classroom/${classroom.id}`)}
                   icon={
                     <Avatar
@@ -147,7 +149,9 @@ export default function Sidebar() {
               {registeredClassrooms.map((classroom) => (
                 <MenuItem
                   key={classroom.id}
-                  active={location.pathname === `/classroom/${classroom.id}`}
+                  active={location.pathname.includes(
+                    `/classroom/${classroom.id}`
+                  )}
                   onClick={() => navigate(`/classroom/${classroom.id}`)}
                   icon={
                     <Avatar

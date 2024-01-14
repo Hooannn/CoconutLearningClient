@@ -2,6 +2,7 @@ import { axiosIns } from "./useAxiosIns";
 import useAuthStore from "../stores/auth";
 import { toast } from "react-hot-toast";
 import useAppStore from "../stores/app";
+import cookies from "../libs/cookies";
 
 const useRefreshToken = () => {
   const {
@@ -15,6 +16,7 @@ const useRefreshToken = () => {
     toast.error("Login session expired, please login again");
     resetAuthStore();
     resetAppStore();
+    cookies.set("redirect_path", location.pathname);
     window.location.href = "/auth";
   };
 

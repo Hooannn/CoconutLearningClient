@@ -14,7 +14,7 @@ import {
 } from "@nextui-org/react";
 import { AiOutlineUser } from "react-icons/ai";
 import { FaEllipsisVertical } from "react-icons/fa6";
-import { Comment, IResponseData } from "../../types";
+import { Classwork, Comment, IResponseData } from "../../types";
 import dayjs from "../../libs/dayjs";
 import useAuthStore from "../../stores/auth";
 import ReactQuill from "react-quill";
@@ -29,6 +29,7 @@ import { formats, modules } from "../../configs/quill";
 export default function CommentCard(props: {
   comment: Comment;
   classroom: Classroom;
+  classwork?: Classwork;
 }) {
   const axios = useAxiosIns();
   const { user } = useAuthStore();
@@ -45,10 +46,18 @@ export default function CommentCard(props: {
     onSuccess: (data) => {
       toast.success(data.data.message || "Deleted successfully");
       onDeleteModalClose();
-      queryClient.invalidateQueries([
-        "fetch/posts/classroom",
-        props.classroom.id,
-      ]);
+      if (props.classwork) {
+        queryClient.invalidateQueries([
+          "fetch/classwork/details",
+          props.classroom.id,
+          props.classwork.id,
+        ]);
+      } else {
+        queryClient.invalidateQueries([
+          "fetch/posts/classroom",
+          props.classroom.id,
+        ]);
+      }
     },
   });
 
