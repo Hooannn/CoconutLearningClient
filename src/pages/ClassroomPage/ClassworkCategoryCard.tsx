@@ -115,13 +115,11 @@ export default function ClassworkCategoryCard(props: {
             </>
           ) : (
             <>
-              <div className="text-base mx-auto py-3">
-                <div className="w-1/2 mx-auto">
+              <div className="text-base mx-auto py-3 w-full text-center">
+                <div className="w-32 mx-auto">
                   <SVG3 />
                 </div>
-                <small>
-                  Students will see this topic after you add an assignment
-                </small>
+                <small>No assignments now.</small>
               </div>
             </>
           )}

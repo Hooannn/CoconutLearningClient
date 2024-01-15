@@ -97,7 +97,7 @@ export default function ClassworkPage() {
                       />
                     </Tab>
                     <Tab
-                      key="students_assignment"
+                      key="student_assignments"
                       title={
                         <div className="flex items-center space-x-2">
                           <span>Students assignment</span>

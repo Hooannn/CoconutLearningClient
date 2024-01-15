@@ -55,7 +55,7 @@ export default function SignInForm() {
   return (
     <>
       <div>
-        <h3 className="font-medium text-3xl">Welcome to Panorama,</h3>
+        <h3 className="font-medium text-3xl">Welcome to Coconut,</h3>
         <h3 className="font-medium text-3xl">Sign In to Continue.</h3>
       </div>
       <div>

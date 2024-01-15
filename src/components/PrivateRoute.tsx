@@ -7,6 +7,7 @@ export default function PrivateRoute(props: PropsWithChildren) {
   const location = useLocation();
   const { isLoggedIn } = useAuthStore();
   if (!isLoggedIn) {
+    console.log(location.pathname);
     cookies.set("redirect_path", location.pathname);
     return <Navigate to={"/auth"} replace />;
   }

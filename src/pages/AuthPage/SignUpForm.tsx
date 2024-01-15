@@ -57,7 +57,7 @@ export default function SignUpForm() {
   return (
     <>
       <div>
-        <h3 className="font-medium text-3xl">Welcome to Panorama,</h3>
+        <h3 className="font-medium text-3xl">Welcome to Coconut,</h3>
         <h3 className="font-medium text-3xl">
           Create a new account to continue.
         </h3>

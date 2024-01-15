@@ -69,7 +69,7 @@ export default function Sidebar() {
               button: ({ active }) => {
                 return {
                   color: active ? "rgb(3 105 161)" : "black",
-                  backgroundColor: active ? "rgb(186 230 253)" : "undefined",
+                  backgroundColor: active ? "rgb(186 230 253)" : "transparent",
                   fontWeight: active ? "bold" : "medium",
                   borderRadius: "12px",
                   margin: "4px 0",
