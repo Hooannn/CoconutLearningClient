@@ -7,4 +7,14 @@ export interface Assignment {
   description?: string;
   score?: number;
   submitted: boolean;
+  created_at: string;
+  updated_at: string;
+  grade: {
+    id: string;
+    grade: number;
+    comment?: string;
+    created_at: string;
+    updated_at: string;
+    graded_by: IUser;
+  };
 }

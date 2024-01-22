@@ -86,23 +86,6 @@ export default function DetailsTab(props: {
     },
   });
 
-  const changeStatusToSubmittedMutation = useMutation({
-    mutationFn: () =>
-      axios.put<IResponseData<unknown>>(
-        `/api/v1/assignments/${props.classroom.id}/${props.classwork.id}/mark/submitted`
-      ),
-    onError,
-    onSuccess(data) {
-      toast.success(data.data?.message || "Updated successfully");
-      queryClient.invalidateQueries([
-        "fetch/assignment",
-        props.classroom.id,
-        props.classwork.id,
-        user?.id,
-      ]);
-    },
-  });
-
   const changeStatusToUnsubmittedMutation = useMutation({
     mutationFn: () =>
       axios.put<IResponseData<unknown>>(
@@ -201,10 +184,6 @@ export default function DetailsTab(props: {
       submitted: true,
       description,
     });
-  };
-
-  const resubmit = async () => {
-    await changeStatusToSubmittedMutation.mutateAsync();
   };
 
   return (
@@ -412,18 +391,35 @@ export default function DetailsTab(props: {
                     {assignment == undefined ? (
                       <>
                         <div className="w-full flex items-center flex-col">
-                          {selectedFiles?.map((file: File) => (
-                            <FileCard
-                              showCloseButton
-                              onClose={(file) => {
-                                setSelectedFiles(
-                                  selectedFiles.filter((f) => f.id !== file.id)
-                                );
-                              }}
-                              file={file}
-                              isSelected={false}
-                            />
-                          ))}
+                          <>
+                            {selectedFiles.length > 0 ? (
+                              <>
+                                {selectedFiles?.map((file: File) => (
+                                  <FileCard
+                                    showCloseButton
+                                    onClose={(file) => {
+                                      setSelectedFiles(
+                                        selectedFiles.filter(
+                                          (f) => f.id !== file.id
+                                        )
+                                      );
+                                    }}
+                                    file={file}
+                                    isSelected={false}
+                                  />
+                                ))}
+                              </>
+                            ) : (
+                              <div className="py-3 opacity-60 flex flex-col items-center">
+                                <div className="py-1">
+                                  <AiOutlineFileText size={30} />
+                                </div>
+                                <div className="text-xs">
+                                  No file presented.
+                                </div>
+                              </div>
+                            )}
+                          </>
                         </div>
                         <Button
                           onClick={onOpenFolder}
@@ -434,33 +430,42 @@ export default function DetailsTab(props: {
                           <AiOutlinePlus />
                           Add or create
                         </Button>
-                        {selectedFiles.length > 0 ? (
-                          <Button
-                            isLoading={submitMutation.isLoading}
-                            color="primary"
-                            onClick={submit}
-                          >
-                            Submit
-                          </Button>
-                        ) : (
-                          <Button color="primary">Mark as submitted</Button>
-                        )}
+                        <Button
+                          isLoading={submitMutation.isLoading}
+                          color="primary"
+                          onClick={submit}
+                        >
+                          Submit
+                        </Button>
                       </>
                     ) : (
                       <>
                         <div className="w-full flex items-center flex-col">
-                          {selectedFiles?.map((file: File) => (
-                            <FileCard
-                              showCloseButton={!assignment.submitted}
-                              onClose={(file) => {
-                                setSelectedFiles(
-                                  selectedFiles.filter((f) => f.id !== file.id)
-                                );
-                              }}
-                              file={file}
-                              isSelected={false}
-                            />
-                          ))}
+                          {selectedFiles.length > 0 ? (
+                            <>
+                              {selectedFiles?.map((file: File) => (
+                                <FileCard
+                                  showCloseButton={!assignment.submitted}
+                                  onClose={(file) => {
+                                    setSelectedFiles(
+                                      selectedFiles.filter(
+                                        (f) => f.id !== file.id
+                                      )
+                                    );
+                                  }}
+                                  file={file}
+                                  isSelected={false}
+                                />
+                              ))}
+                            </>
+                          ) : (
+                            <div className="py-3 opacity-60 flex flex-col items-center">
+                              <div className="py-1">
+                                <AiOutlineFileText size={30} />
+                              </div>
+                              <div className="text-xs">No file presented.</div>
+                            </div>
+                          )}
                         </div>
                         {assignment.submitted ? (
                           <Button
@@ -483,19 +488,13 @@ export default function DetailsTab(props: {
                               <AiOutlinePlus />
                               Add or create
                             </Button>
-                            {selectedFiles.length > 0 ? (
-                              <Button
-                                isLoading={
-                                  changeStatusToSubmittedMutation.isLoading
-                                }
-                                color="primary"
-                                onClick={resubmit}
-                              >
-                                Submit
-                              </Button>
-                            ) : (
-                              <Button color="primary">Mark as submitted</Button>
-                            )}
+                            <Button
+                              isLoading={submitMutation.isLoading}
+                              color="primary"
+                              onClick={submit}
+                            >
+                              Submit
+                            </Button>
                           </>
                         )}
                       </>
@@ -510,6 +509,7 @@ export default function DetailsTab(props: {
                     <div>Description (optional)</div>
                   </div>
                   <Textarea
+                    isDisabled={assignment?.submitted}
                     value={description}
                     onValueChange={(v) => setDescription(v)}
                     className="mt-2"

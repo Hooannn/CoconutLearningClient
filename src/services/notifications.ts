@@ -36,7 +36,7 @@ const useNotifications = () => {
         `/api/v1/notifications/mark/${params.notificationId}`
       ),
     onSuccess: () => {
-      invalidateQueries();
+      refetchNotifications();
     },
   });
 
@@ -44,7 +44,7 @@ const useNotifications = () => {
     mutationFn: () =>
       axios.post<IResponseData<unknown>>(`/api/v1/notifications/mark-all`),
     onSuccess: () => {
-      invalidateQueries();
+      refetchNotifications();
     },
   });
 
@@ -52,7 +52,7 @@ const useNotifications = () => {
     mutationFn: () =>
       axios.delete<IResponseData<unknown>>(`/api/v1/notifications/own`),
     onSuccess: () => {
-      invalidateQueries();
+      refetchNotifications();
     },
   });
 
@@ -63,7 +63,7 @@ const useNotifications = () => {
     getUnreadNotificationsCountQuery.isLoading ||
     getNotificationsQuery.isLoading;
 
-  const invalidateQueries = () => {
+  const refetchNotifications = () => {
     queryClient.invalidateQueries(["fetch/notifications/unread/count"]);
     queryClient.invalidateQueries(["fetch/notifications"]);
   };
@@ -72,7 +72,7 @@ const useNotifications = () => {
   useEffect(() => {
     if (socket) {
       socket.on("notification:created", () => {
-        invalidateQueries();
+        refetchNotifications();
       });
 
       socket.on(
@@ -89,15 +89,24 @@ const useNotifications = () => {
                 "fetch/classroom/id",
                 data.classroom_id,
               ]);
+
             if (
               [ClassroomUpdateType.POST, ClassroomUpdateType.COMMENT].includes(
                 data.type
               )
-            )
+            ) {
               queryClient.invalidateQueries([
                 "fetch/posts/classroom",
                 data.classroom_id,
               ]);
+              if (location.pathname.includes("/classwork")) {
+                queryClient.invalidateQueries([
+                  "fetch/classwork/details",
+                  data.classroom_id,
+                  location.pathname.split("/")[3],
+                ]);
+              }
+            }
 
             if ([ClassroomUpdateType.CLASSWORK].includes(data.type)) {
               queryClient.invalidateQueries([
@@ -108,6 +117,24 @@ const useNotifications = () => {
                 "fetch/classwork_categories/classroom",
                 data.classroom_id,
               ]);
+
+              if (location.pathname.includes("/classwork")) {
+                queryClient.invalidateQueries([
+                  "fetch/classwork/details",
+                  data.classroom_id,
+                  location.pathname.split("/")[3],
+                ]);
+              }
+            }
+
+            if ([ClassroomUpdateType.ASSIGNMENT].includes(data.type)) {
+              if (location.pathname.includes("/classwork")) {
+                queryClient.invalidateQueries([
+                  "fetch/classwork/details",
+                  data.classroom_id,
+                  location.pathname.split("/")[3],
+                ]);
+              }
             }
           }
 
@@ -142,6 +169,7 @@ enum ClassroomUpdateType {
   POST = "POST",
   COMMENT = "COMMENT",
   MEMBER = "MEMBER",
+  ASSIGNMENT = "ASSIGNMENT",
 }
 
 export default useNotifications;

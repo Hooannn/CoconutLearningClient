@@ -57,7 +57,10 @@ export default function ClassworkCard(props: {
         {props.isProvider && (
           <div className="flex items-center">
             <div className="flex flex-col border-l-2 border-gray px-3 w-28">
-              <div className="text-4xl">0</div>
+              <div className="text-4xl">
+                {props.classwork.assignments?.filter((a) => a.submitted)
+                  .length || 0}
+              </div>
               <small className="opacity-60 text-xs">Submitted</small>
             </div>
             <div className="flex flex-col border-l-2 border-gray px-3 w-28">
