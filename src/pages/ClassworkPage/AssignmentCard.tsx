@@ -78,13 +78,23 @@ export default function AssignmentCard(props: {
             </div>
             <div>
               <>
-                {props.assignment.submitted ? (
-                  <div className="text-green-600">
-                    <small>Submitted</small>
-                  </div>
+                {props.assignment.grade === null ? (
+                  <>
+                    {props.assignment.submitted ? (
+                      <div className="text-green-600">
+                        <small>Submitted</small>
+                      </div>
+                    ) : (
+                      <div className="opacity-60">
+                        <small>Unsubmitted</small>
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div className="opacity-60">
-                    <small>Unsubmitted</small>
+                  <div className="text-green-700">
+                    <small>
+                      {props.assignment.grade.grade}/{props.classwork.score}
+                    </small>
                   </div>
                 )}
               </>

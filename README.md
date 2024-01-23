@@ -1,7 +1,7 @@
 # Todo
 
-- studentAssignmentsTab - filter by status, assignment card graded status
-- classwork details - student when graded can not edit assignment, show score when graded
+- update classwork -> test schedule
+- create classwork -> test schedule if deadline is tomorrow or today
 
 # React + TypeScript + Vite
 

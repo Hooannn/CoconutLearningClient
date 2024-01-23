@@ -28,6 +28,22 @@ export default function FileCard(props: {
           </small>
         </div>
       );
+    } else if (props.file.content_type.startsWith("video/")) {
+      return (
+        <div className="flex flex-col w-full h-full overflow-hidden items-center justify-center text-center">
+          <video
+            className="h-[60px] video-e rounded-large"
+            src={fileUrl}
+            muted
+            controls
+            autoPlay
+          ></video>
+          <small className="truncate w-full mt-1">
+            <strong>{props.file.name}</strong>
+            <div>{props.file.content_type}</div>
+          </small>
+        </div>
+      );
     } else {
       return (
         <div className="flex flex-col w-full h-full overflow-hidden items-center justify-center text-center">

@@ -49,3 +49,9 @@
 .ps-submenu-content {
     background-color: transparent !important;
 }
+
+
+.video-e::-webkit-media-controls {
+    width: 100% !important;
+    height: 100% !important;
+}
