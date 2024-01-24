@@ -1,5 +1,5 @@
 import ReactQuill from "react-quill";
-import { Classwork } from "../../types";
+import { Classwork, ClassworkCategory } from "../../types";
 import { Classroom } from "../../types/classroom";
 import dayjs from "../../libs/dayjs";
 import FileCard from "../../components/FileCard";
@@ -16,6 +16,7 @@ import { AiOutlineFileText } from "react-icons/ai";
 import { FaEllipsisVertical } from "react-icons/fa6";
 import DeleteClassworkModal from "./DeleteClassworkModal";
 import { useNavigate } from "react-router-dom";
+import EditClassworkModal from "./EditClassworkModal";
 
 export default function ClassworkCard(props: {
   classwork: Classwork;
@@ -105,21 +106,38 @@ export function ClassworkCardTitle(props: {
   classwork: Classwork;
   classroom: Classroom;
   isProvider: boolean;
+  classworkCategories: ClassworkCategory[];
 }) {
   const {
     isOpen: isDeleteClassworkModalOpen,
     onOpen: onOpenDeleteClassworkModal,
     onClose: onDeleteClassworkModalClose,
   } = useDisclosure();
+
+  const {
+    isOpen: isUpdateClassworkModalOpen,
+    onOpen: onOpenUpdateClassworkModal,
+    onClose: onUpdateClassworkModalClose,
+  } = useDisclosure();
   return (
     <div className="flex items-center justify-between text-small">
-      <DeleteClassworkModal
-        isOpen={isDeleteClassworkModalOpen}
-        onClose={onDeleteClassworkModalClose}
-        classroom={props.classroom}
-        classwork={props.classwork}
-      />
-
+      {props.isProvider && (
+        <>
+          <DeleteClassworkModal
+            isOpen={isDeleteClassworkModalOpen}
+            onClose={onDeleteClassworkModalClose}
+            classroom={props.classroom}
+            classwork={props.classwork}
+          />
+          <EditClassworkModal
+            isOpen={isUpdateClassworkModalOpen}
+            onClose={onUpdateClassworkModalClose}
+            classroom={props.classroom}
+            classwork={props.classwork}
+            classworkCategories={props.classworkCategories}
+          />
+        </>
+      )}
       <div className="flex items-center gap-2">
         <Button
           isIconOnly
@@ -136,7 +154,9 @@ export function ClassworkCardTitle(props: {
       <div className="flex items-center gap-2">
         <small className="opacity-60">
           {props.classwork.deadline
-            ? dayjs(props.classwork.deadline).fromNow()
+            ? dayjs(props.classwork.deadline).isBefore(dayjs())
+              ? "Deadline has passed"
+              : dayjs(props.classwork.deadline).fromNow()
             : "No deadline"}
         </small>
         {props.isProvider && (
@@ -147,7 +167,11 @@ export function ClassworkCardTitle(props: {
               </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="Post action" variant="flat">
-              <DropdownItem className="py-2" key="edit_classwork">
+              <DropdownItem
+                onClick={onOpenUpdateClassworkModal}
+                className="py-2"
+                key="edit_classwork"
+              >
                 Edit
               </DropdownItem>
               <DropdownItem

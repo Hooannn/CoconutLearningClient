@@ -411,7 +411,17 @@ export default function DetailsTab(props: {
                           <div>Your assignment</div>
                           <div>
                             {assignment == undefined ? (
-                              <div className="opacity-60">Unsubmitted</div>
+                              <>
+                                {dayjs(props.classwork.deadline).isBefore(
+                                  dayjs()
+                                ) ? (
+                                  <div className="opacity-60">
+                                    Deadline has passed
+                                  </div>
+                                ) : (
+                                  <div className="opacity-60">Unsubmitted</div>
+                                )}
+                              </>
                             ) : (
                               <>
                                 {isGraded ? (
@@ -426,9 +436,19 @@ export default function DetailsTab(props: {
                                         Submitted
                                       </div>
                                     ) : (
-                                      <div className="opacity-60">
-                                        Unsubmitted
-                                      </div>
+                                      <>
+                                        {dayjs(
+                                          props.classwork.deadline
+                                        ).isBefore(dayjs()) ? (
+                                          <div className="opacity-60">
+                                            Deadline has passed
+                                          </div>
+                                        ) : (
+                                          <div className="opacity-60">
+                                            Unsubmitted
+                                          </div>
+                                        )}
+                                      </>
                                     )}
                                   </>
                                 )}

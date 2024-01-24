@@ -1,11 +1,8 @@
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import useAxiosIns from "../../hooks/useAxiosIns";
-import useAuthStore from "../../stores/auth";
 import { Classwork, ClassworkCategory, IResponseData } from "../../types";
 import { LuUserSquare } from "react-icons/lu";
-import { onError } from "../../utils/error-handlers";
 import { Classroom } from "../../types/classroom";
 import {
   Accordion,
@@ -25,7 +22,6 @@ import {
   AiOutlineBars,
   AiOutlineBook,
   AiOutlineFileText,
-  AiOutlineFileUnknown,
   AiOutlinePlus,
 } from "react-icons/ai";
 import SVG3 from "../../components/SVG3";
@@ -40,8 +36,6 @@ export default function ClassworkTab(props: {
   isProvider: boolean;
 }) {
   const axios = useAxiosIns();
-  const { user } = useAuthStore();
-  const queryClient = useQueryClient();
 
   const getClassworkCategoriesQuery = useQuery({
     queryKey: ["fetch/classwork_categories/classroom", props.classroom.id],
@@ -128,20 +122,6 @@ export default function ClassworkTab(props: {
                   Exam
                 </DropdownItem>
                 <DropdownItem
-                  key="lab"
-                  className="py-2"
-                  startContent={<AiOutlineFileText size={20} />}
-                >
-                  Lab
-                </DropdownItem>
-                <DropdownItem
-                  key="question"
-                  className="py-2"
-                  startContent={<AiOutlineFileUnknown size={20} />}
-                >
-                  Question
-                </DropdownItem>
-                <DropdownItem
                   key="document"
                   showDivider
                   startContent={<AiOutlineBook />}
@@ -216,6 +196,7 @@ export default function ClassworkTab(props: {
                           key={i}
                           title={
                             <ClassworkCardTitle
+                              classworkCategories={classworkCategories}
                               classroom={props.classroom}
                               classwork={classwork}
                               isProvider={props.isProvider}
@@ -241,6 +222,7 @@ export default function ClassworkTab(props: {
                     })
                     .map((category) => (
                       <ClassworkCategoryCard
+                        classworkCategories={classworkCategories}
                         classworkCategory={category}
                         classworks={classworks.filter(
                           (c) => c.category?.id === category.id

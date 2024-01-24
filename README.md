@@ -1,5 +1,7 @@
 # Todo
 
+- profile update, change avatar
+- update classwork assignees -> ???
 - update classwork -> test schedule
 - create classwork -> test schedule if deadline is tomorrow or today
 

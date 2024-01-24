@@ -4,27 +4,24 @@ import {
   ModalHeader,
   ModalBody,
   Button,
-  Divider,
+  Avatar,
   Card,
   CardBody,
+  Divider,
   Input,
-  useDisclosure,
-  Avatar,
   Select,
   SelectItem,
+  useDisclosure,
 } from "@nextui-org/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { Classroom } from "../../types/classroom";
 import {
+  Classwork,
   ClassworkCategory,
   ClassworkType,
   File,
   IResponseData,
   IUser,
 } from "../../types";
-import { onError } from "../../utils/error-handlers";
-import useAxiosIns from "../../hooks/useAxiosIns";
-import { Classroom } from "../../types/classroom";
 import {
   AiOutlineClose,
   AiOutlineFileText,
@@ -32,22 +29,28 @@ import {
   AiOutlineUser,
 } from "react-icons/ai";
 import ReactQuill from "react-quill";
-import FileCard from "../../components/FileCard";
-import { modules, formats } from "../../configs/quill";
-import { useState } from "react";
-import dayjs from "../../libs/dayjs";
-import UserFolder from "../../components/UserFolder";
 import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
-export default function CreateExamModal(props: {
+import FileCard from "../../components/FileCard";
+import UserFolder from "../../components/UserFolder";
+import { modules, formats } from "../../configs/quill";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import useAxiosIns from "../../hooks/useAxiosIns";
+import { onError } from "../../utils/error-handlers";
+
+export default function EditClassworkModal(props: {
   isOpen: boolean;
   onClose: () => void;
   classroom: Classroom;
+  classwork: Classwork;
   classworkCategories: ClassworkCategory[];
 }) {
   const axios = useAxiosIns();
   const queryClient = useQueryClient();
 
-  const createClassworkMutation = useMutation({
+  const updateClassworkMutation = useMutation({
     mutationFn: (params: {
       title: string;
       description?: string;
@@ -58,13 +61,13 @@ export default function CreateExamModal(props: {
       file_ids: string[];
       category_id?: string;
     }) =>
-      axios.post<IResponseData<unknown>>(
-        `/api/v1/classwork/${props.classroom.id}`,
+      axios.put<IResponseData<unknown>>(
+        `/api/v1/classwork/${props.classroom.id}/${props.classwork.id}`,
         params
       ),
     onError,
     onSuccess(data) {
-      toast.success(data.data?.message || "Created");
+      toast.success(data.data?.message || "Updated");
       queryClient.invalidateQueries([
         "fetch/classworks/classroom",
         props.classroom.id,
@@ -72,9 +75,9 @@ export default function CreateExamModal(props: {
     },
   });
 
-  const [description, setDescription] = useState("");
-  const [title, setTitle] = useState("");
-  const [score, setScore] = useState("100");
+  const [description, setDescription] = useState(props.classwork.description);
+  const [title, setTitle] = useState(props.classwork.title);
+  const [score, setScore] = useState(props.classwork.score.toString());
 
   const {
     onOpen: onOpenFolder,
@@ -82,7 +85,9 @@ export default function CreateExamModal(props: {
     onClose: onFolderClose,
   } = useDisclosure();
 
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>(
+    props.classwork.files
+  );
 
   const onFilesSelected = (files: File[]) => {
     const newFiles = [...selectedFiles, ...files];
@@ -107,26 +112,32 @@ export default function CreateExamModal(props: {
   ];
 
   const [date, setDate] = useState<DateValueType>({
-    startDate: null,
-    endDate: null,
+    startDate: dayjs(props.classwork.deadline).format("YYYY-MM-DD") ?? null,
+    endDate: dayjs(props.classwork.deadline).format("YYYY-MM-DD") ?? null,
   });
 
   const handleValueChange = (newValue: DateValueType) => {
     setDate(newValue);
   };
 
-  const [assignees, setAssignees] = useState<string[]>([
-    "ALL",
-    ...props.classroom.users.map((user) => user.id),
-  ]);
+  const [assignees, setAssignees] = useState<string[]>(
+    props.classwork.assignees.map((a) => a.id).length ===
+      props.classroom.users.length
+      ? ["ALL", ...props.classwork.assignees.map((a) => a.id)]
+      : props.classwork.assignees.map((a) => a.id)
+  );
 
-  const [category, setCategory] = useState<string>();
+  const [category, setCategory] = useState<string>(
+    props.classwork.category?.id ?? ""
+  );
 
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(
+    dayjs(props.classwork.deadline).format("HH:mm")
+  );
 
   const isValidTime = () => dayjs(time, "HH:mm", true).isValid();
 
-  const create = async () => {
+  const save = async () => {
     if (!isValidTime) {
       toast.error("Invalid time");
       return;
@@ -152,7 +163,7 @@ export default function CreateExamModal(props: {
       parse = undefined;
     }
 
-    await createClassworkMutation.mutateAsync({
+    await updateClassworkMutation.mutateAsync({
       title,
       description,
       type: ClassworkType.EXAM,
@@ -160,7 +171,7 @@ export default function CreateExamModal(props: {
       deadline: parse,
       assignee_ids: assignees.filter((a) => a !== "ALL"),
       file_ids: selectedFiles.map((f) => f.id),
-      category_id: category,
+      category_id: category.length > 0 ? category : undefined,
     });
     props.onClose();
   };
@@ -184,7 +195,7 @@ export default function CreateExamModal(props: {
                 <div className="flex gap-2 items-center">
                   <Button
                     isIconOnly
-                    isLoading={createClassworkMutation.isLoading}
+                    isLoading={updateClassworkMutation.isLoading}
                     onClick={props.onClose}
                   >
                     <AiOutlineClose />
@@ -205,13 +216,13 @@ export default function CreateExamModal(props: {
                 </div>
 
                 <Button
-                  onClick={create}
+                  onClick={save}
                   color="primary"
+                  isLoading={updateClassworkMutation.isLoading}
                   size="lg"
-                  isLoading={createClassworkMutation.isLoading}
                   className="px-10"
                 >
-                  Create
+                  Save
                 </Button>
               </ModalHeader>
               <Divider />
@@ -553,6 +564,7 @@ export default function CreateExamModal(props: {
                           <Select
                             items={props.classworkCategories}
                             placeholder="Select a category"
+                            selectedKeys={category ? [category] : []}
                             onSelectionChange={(selection) => {
                               const keys = Array.from(selection) as string[];
                               setCategory(keys[0]?.toString() ?? "");

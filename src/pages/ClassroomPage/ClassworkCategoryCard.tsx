@@ -21,6 +21,7 @@ import DeleteCategoryModal from "./DeleteCategoryModal";
 import ClassworkCard, { ClassworkCardTitle } from "./ClassworkCard";
 
 export default function ClassworkCategoryCard(props: {
+  classworkCategories: ClassworkCategory[];
   classworkCategory: ClassworkCategory;
   classworks: Classwork[];
   classroom: Classroom;
@@ -97,6 +98,7 @@ export default function ClassworkCategoryCard(props: {
                     hideIndicator
                     title={
                       <ClassworkCardTitle
+                        classworkCategories={props.classworkCategories}
                         classroom={props.classroom}
                         classwork={classwork}
                         isProvider={props.isProvider}
