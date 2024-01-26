@@ -12,7 +12,6 @@ import {
   Avatar,
   Input,
   useDisclosure,
-  user,
 } from "@nextui-org/react";
 import {
   AiOutlineClose,
@@ -264,7 +263,7 @@ export function UpdatePasswordTab() {
   return (
     <Card shadow="sm" radius="sm">
       <CardBody className="items-center">
-        <div className="max-w-lg w-full flex flex-col gap-4">
+        <div className="max-w-lg w-full flex flex-col gap-4 pb-2">
           <div>
             <div>
               <small>Current password</small>
@@ -342,7 +341,6 @@ export function UpdatePasswordTab() {
                   value === watchPassword || "Passwords do not match",
               })}
               color="primary"
-              label="Confirm password"
               variant="bordered"
               placeholder="Enter your password again"
               endContent={

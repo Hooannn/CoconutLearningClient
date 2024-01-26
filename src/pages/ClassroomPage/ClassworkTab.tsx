@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { Classwork, ClassworkCategory, IResponseData } from "../../types";
-import { LuUserSquare } from "react-icons/lu";
 import { Classroom } from "../../types/classroom";
 import {
   Accordion,
@@ -29,6 +28,7 @@ import CreateCategoryModal from "./CreateCategoryModal";
 import ClassworkCategoryCard from "./ClassworkCategoryCard";
 import CreateExamModal from "./CreateExamModal";
 import ClassworkCard, { ClassworkCardTitle } from "./ClassworkCard";
+import CreateDocumentModal from "./CreateDocumentModal";
 
 export default function ClassworkTab(props: {
   classroom: Classroom;
@@ -80,6 +80,12 @@ export default function ClassworkTab(props: {
     onClose: onCreateExamModalClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isCreateDocumentModalOpen,
+    onOpen: onOpenCreateDocumentModal,
+    onClose: onCreateDocumentModalClose,
+  } = useDisclosure();
+
   return (
     <div className="flex flex-col gap-4 items-start max-w-[980px] mx-auto h-full">
       {isLoading ? (
@@ -99,7 +105,13 @@ export default function ClassworkTab(props: {
             isOpen={isCreateExamModalOpen}
             onClose={onCreateExamModalClose}
           />
-          {props.isProvider ? (
+          <CreateDocumentModal
+            classroom={props.classroom}
+            classworkCategories={classworkCategories}
+            isOpen={isCreateDocumentModalOpen}
+            onClose={onCreateDocumentModalClose}
+          />
+          {props.isProvider && (
             <Dropdown>
               <DropdownTrigger>
                 <Button className="py-6 px-5" color="primary">
@@ -124,6 +136,7 @@ export default function ClassworkTab(props: {
                 <DropdownItem
                   key="document"
                   showDivider
+                  onClick={onOpenCreateDocumentModal}
                   startContent={<AiOutlineBook />}
                 >
                   Document
@@ -137,11 +150,6 @@ export default function ClassworkTab(props: {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
-          ) : (
-            <Button color="primary" variant="light">
-              <LuUserSquare size={16} />
-              See your assignments
-            </Button>
           )}
 
           {classworkCategories.length > 0 && (

@@ -20,7 +20,13 @@ import {
   AiOutlineUser,
 } from "react-icons/ai";
 import { Classroom } from "../../types/classroom";
-import { Assignment, Classwork, File, IResponseData } from "../../types";
+import {
+  Assignment,
+  Classwork,
+  ClassworkCategory,
+  File,
+  IResponseData,
+} from "../../types";
 import { FaEllipsisVertical } from "react-icons/fa6";
 import dayjs from "../../libs/dayjs";
 import { FaCircle } from "react-icons/fa";
@@ -36,11 +42,14 @@ import { onError } from "../../utils/error-handlers";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import FileCard from "../../components/FileCard";
 import UserFolder from "../../components/UserFolder";
+import DeleteClassworkModal from "../ClassroomPage/DeleteClassworkModal";
+import EditClassworkModal from "../ClassroomPage/EditClassworkModal";
 
 export default function DetailsTab(props: {
   classroom: Classroom;
   classwork: Classwork;
   isProvider: boolean;
+  classworkCategories?: ClassworkCategory[];
 }) {
   const { user } = useAuthStore();
   const quillRef = useRef<ReactQuill>(null);
@@ -189,6 +198,17 @@ export default function DetailsTab(props: {
     });
   };
 
+  const {
+    isOpen: isDeleteClassworkModalOpen,
+    onOpen: onOpenDeleteClassworkModal,
+    onClose: onDeleteClassworkModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isUpdateClassworkModalOpen,
+    onOpen: onOpenUpdateClassworkModal,
+    onClose: onUpdateClassworkModalClose,
+  } = useDisclosure();
   return (
     <>
       <UserFolder
@@ -196,6 +216,23 @@ export default function DetailsTab(props: {
         isOpen={isFolderOpen}
         onClose={onFolderClose}
       />
+      {props.isProvider && (
+        <>
+          <DeleteClassworkModal
+            isOpen={isDeleteClassworkModalOpen}
+            onClose={onDeleteClassworkModalClose}
+            classroom={props.classroom}
+            classwork={props.classwork}
+          />
+          <EditClassworkModal
+            isOpen={isUpdateClassworkModalOpen}
+            onClose={onUpdateClassworkModalClose}
+            classroom={props.classroom}
+            classwork={props.classwork}
+            classworkCategories={props.classworkCategories || []}
+          />
+        </>
+      )}
       <div className="flex flex-col gap-4 items-start max-w-[980px] mx-auto h-full">
         <div className="flex gap-4 w-full">
           <div>
@@ -222,13 +259,18 @@ export default function DetailsTab(props: {
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu aria-label="Post action" variant="flat">
-                    <DropdownItem className="py-2" key="edit_classwork">
+                    <DropdownItem
+                      onClick={onOpenUpdateClassworkModal}
+                      className="py-2"
+                      key="edit_classwork"
+                    >
                       Edit
                     </DropdownItem>
                     <DropdownItem
                       color="danger"
                       className="py-2"
                       key="delete_classwork"
+                      onClick={onOpenDeleteClassworkModal}
                     >
                       Delete
                     </DropdownItem>
@@ -247,7 +289,11 @@ export default function DetailsTab(props: {
               </div>
               <div>{dayjs(props.classwork.created_at).fromNow()}</div>
             </div>
-            <div>{props.classwork.score} scores</div>
+
+            {props.classwork.score > 0 && (
+              <div>{props.classwork.score} scores</div>
+            )}
+
             <Divider className="bg-primary my-3" />
             {(props.classwork.description?.length > 0 ||
               props.classwork.files.length > 0) && (
@@ -370,7 +416,7 @@ export default function DetailsTab(props: {
               </Button>
             </div>
           </div>
-          {!props.isProvider && (
+          {!props.isProvider && props.classwork.score > 0 && (
             <>
               {getAssignmentQuery.isLoading ? (
                 <div className="flex flex-col w-96 gap-2">

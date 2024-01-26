@@ -1,5 +1,5 @@
 import ReactQuill from "react-quill";
-import { Classwork, ClassworkCategory } from "../../types";
+import { Classwork, ClassworkCategory, ClassworkType } from "../../types";
 import { Classroom } from "../../types/classroom";
 import dayjs from "../../libs/dayjs";
 import FileCard from "../../components/FileCard";
@@ -12,7 +12,7 @@ import {
   DropdownTrigger,
   useDisclosure,
 } from "@nextui-org/react";
-import { AiOutlineFileText } from "react-icons/ai";
+import { AiOutlineBook, AiOutlineFileText } from "react-icons/ai";
 import { FaEllipsisVertical } from "react-icons/fa6";
 import DeleteClassworkModal from "./DeleteClassworkModal";
 import { useNavigate } from "react-router-dom";
@@ -26,9 +26,12 @@ export default function ClassworkCard(props: {
   const navigate = useNavigate();
   return (
     <div>
-      <div className="opacity-60 pb-3">
-        <small>Published {dayjs(props.classwork.created_at).fromNow()}</small>
-      </div>
+      {props.classwork.type === ClassworkType.EXAM && (
+        <div className="opacity-60 pb-3">
+          <small>Published {dayjs(props.classwork.created_at).fromNow()}</small>
+        </div>
+      )}
+
       <div className="flex items-center justify-between pb-3">
         <div>
           {props.classwork.description!.length > 0 && (
@@ -55,7 +58,7 @@ export default function ClassworkCard(props: {
             ></ReactQuill>
           )}
         </div>
-        {props.isProvider && (
+        {props.isProvider && props.classwork.type === ClassworkType.EXAM && (
           <div className="flex items-center">
             <div className="flex flex-col border-l-2 border-gray px-3 w-28">
               <div className="text-4xl">
@@ -147,17 +150,27 @@ export function ClassworkCardTitle(props: {
           isDisabled
           radius="full"
         >
-          <AiOutlineFileText size={18} />
+          {props.classwork.type === ClassworkType.EXAM ? (
+            <AiOutlineFileText size={18} />
+          ) : (
+            <AiOutlineBook size={18} />
+          )}
         </Button>
         <div>{props.classwork.title}</div>
       </div>
       <div className="flex items-center gap-2">
         <small className="opacity-60">
-          {props.classwork.deadline
-            ? dayjs(props.classwork.deadline).isBefore(dayjs())
-              ? "Deadline has passed"
-              : dayjs(props.classwork.deadline).fromNow()
-            : "No deadline"}
+          {props.classwork.type === ClassworkType.EXAM ? (
+            <>
+              {props.classwork.deadline
+                ? dayjs(props.classwork.deadline).isBefore(dayjs())
+                  ? "Deadline has passed"
+                  : dayjs(props.classwork.deadline).fromNow()
+                : "No deadline"}
+            </>
+          ) : (
+            <>{dayjs(props.classwork.created_at).fromNow()}</>
+          )}
         </small>
         {props.isProvider && (
           <Dropdown placement="left-end">

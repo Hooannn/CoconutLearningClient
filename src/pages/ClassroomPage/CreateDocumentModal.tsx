@@ -4,80 +4,64 @@ import {
   ModalHeader,
   ModalBody,
   Button,
-  Avatar,
+  Divider,
   Card,
   CardBody,
-  Divider,
   Input,
+  useDisclosure,
+  Avatar,
   Select,
   SelectItem,
-  useDisclosure,
 } from "@nextui-org/react";
-import { Classroom } from "../../types/classroom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import {
-  Classwork,
   ClassworkCategory,
   ClassworkType,
   File,
   IResponseData,
   IUser,
 } from "../../types";
+import { onError } from "../../utils/error-handlers";
+import useAxiosIns from "../../hooks/useAxiosIns";
+import { Classroom } from "../../types/classroom";
 import {
   AiOutlineBook,
   AiOutlineClose,
-  AiOutlineFileText,
   AiOutlineUpload,
   AiOutlineUser,
 } from "react-icons/ai";
 import ReactQuill from "react-quill";
-import Datepicker, { DateValueType } from "react-tailwindcss-datepicker";
 import FileCard from "../../components/FileCard";
-import UserFolder from "../../components/UserFolder";
 import { modules, formats } from "../../configs/quill";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import dayjs from "dayjs";
 import { useState } from "react";
-import toast from "react-hot-toast";
-import useAxiosIns from "../../hooks/useAxiosIns";
-import { onError } from "../../utils/error-handlers";
-import { useLocation } from "react-router-dom";
-
-export default function EditClassworkModal(props: {
+import UserFolder from "../../components/UserFolder";
+export default function CreateDocumentModal(props: {
   isOpen: boolean;
   onClose: () => void;
   classroom: Classroom;
-  classwork: Classwork;
   classworkCategories: ClassworkCategory[];
 }) {
   const axios = useAxiosIns();
   const queryClient = useQueryClient();
-  const location = useLocation();
 
-  const updateClassworkMutation = useMutation({
+  const createClassworkMutation = useMutation({
     mutationFn: (params: {
       title: string;
       description?: string;
       type: ClassworkType;
       score?: number;
-      deadline?: string;
       assignee_ids: string[];
       file_ids: string[];
       category_id?: string;
     }) =>
-      axios.put<IResponseData<unknown>>(
-        `/api/v1/classwork/${props.classroom.id}/${props.classwork.id}`,
+      axios.post<IResponseData<unknown>>(
+        `/api/v1/classwork/${props.classroom.id}`,
         params
       ),
     onError,
     onSuccess(data) {
-      toast.success(data.data?.message || "Updated");
-      if (location.pathname.includes(`/classwork/${props.classwork.id}`)) {
-        queryClient.invalidateQueries([
-          "fetch/classwork/details",
-          props.classroom.id,
-          props.classwork.id,
-        ]);
-      }
+      toast.success(data.data?.message || "Created");
       queryClient.invalidateQueries([
         "fetch/classworks/classroom",
         props.classroom.id,
@@ -85,9 +69,8 @@ export default function EditClassworkModal(props: {
     },
   });
 
-  const [description, setDescription] = useState(props.classwork.description);
-  const [title, setTitle] = useState(props.classwork.title);
-  const [score, setScore] = useState(props.classwork.score.toString());
+  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState("");
 
   const {
     onOpen: onOpenFolder,
@@ -95,9 +78,7 @@ export default function EditClassworkModal(props: {
     onClose: onFolderClose,
   } = useDisclosure();
 
-  const [selectedFiles, setSelectedFiles] = useState<File[]>(
-    props.classwork.files
-  );
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const onFilesSelected = (files: File[]) => {
     const newFiles = [...selectedFiles, ...files];
@@ -121,39 +102,14 @@ export default function EditClassworkModal(props: {
     ...props.classroom.users,
   ];
 
-  const [date, setDate] = useState<DateValueType>({
-    startDate: dayjs(props.classwork.deadline).format("YYYY-MM-DD") ?? null,
-    endDate: dayjs(props.classwork.deadline).format("YYYY-MM-DD") ?? null,
-  });
+  const [assignees, setAssignees] = useState<string[]>([
+    "ALL",
+    ...props.classroom.users.map((user) => user.id),
+  ]);
 
-  const handleValueChange = (newValue: DateValueType) => {
-    setDate(newValue);
-  };
+  const [category, setCategory] = useState<string>();
 
-  const [assignees, setAssignees] = useState<string[]>(
-    props.classwork.assignees.map((a) => a.id).length ===
-      props.classroom.users.length
-      ? ["ALL", ...props.classwork.assignees.map((a) => a.id)]
-      : props.classwork.assignees.map((a) => a.id)
-  );
-
-  const [category, setCategory] = useState<string>(
-    props.classwork.category?.id ?? ""
-  );
-
-  const [time, setTime] = useState(
-    props.classwork.deadline
-      ? dayjs(props.classwork.deadline).format("HH:mm")
-      : ""
-  );
-
-  const isValidTime = () => dayjs(time, "HH:mm", true).isValid();
-
-  const save = async () => {
-    if (!isValidTime) {
-      toast.error("Invalid time");
-      return;
-    }
+  const create = async () => {
     if (assignees.filter((a) => a !== "ALL").length === 0) {
       toast.error("Assignees must have at least one");
       return;
@@ -162,29 +118,17 @@ export default function EditClassworkModal(props: {
       toast.error("Title must not be empty");
       return;
     }
-    const deadline = `${date?.startDate} ${time}`.trim();
-    let parse;
-    try {
-      const d = dayjs(deadline);
-      if (d.isBefore(dayjs())) {
-        toast.error("Deadline must be in the future");
-        return;
-      }
-      parse = d.toISOString();
-    } catch (error) {
-      parse = undefined;
-    }
 
-    await updateClassworkMutation.mutateAsync({
+    await createClassworkMutation.mutateAsync({
       title,
       description,
-      type: ClassworkType.EXAM,
-      score: parseInt(score),
-      deadline: parse,
+      type: ClassworkType.DOCUMENT,
+      score: 0,
       assignee_ids: assignees.filter((a) => a !== "ALL"),
       file_ids: selectedFiles.map((f) => f.id),
-      category_id: category.length > 0 ? category : undefined,
+      category_id: category,
     });
+
     props.onClose();
   };
   return (
@@ -207,7 +151,7 @@ export default function EditClassworkModal(props: {
                 <div className="flex gap-2 items-center">
                   <Button
                     isIconOnly
-                    isLoading={updateClassworkMutation.isLoading}
+                    isLoading={createClassworkMutation.isLoading}
                     onClick={props.onClose}
                   >
                     <AiOutlineClose />
@@ -221,26 +165,20 @@ export default function EditClassworkModal(props: {
                       isDisabled
                       radius="full"
                     >
-                      {props.classwork.type === ClassworkType.EXAM ? (
-                        <AiOutlineFileText size={24} />
-                      ) : (
-                        <AiOutlineBook size={24} />
-                      )}
+                      <AiOutlineBook size={24} />
                     </Button>
-                    <span className="capitalize">
-                      {props.classwork.type.toLocaleLowerCase()}
-                    </span>
+                    Document
                   </div>
                 </div>
 
                 <Button
-                  onClick={save}
+                  onClick={create}
                   color="primary"
-                  isLoading={updateClassworkMutation.isLoading}
                   size="lg"
+                  isLoading={createClassworkMutation.isLoading}
                   className="px-10"
                 >
-                  Save
+                  Create
                 </Button>
               </ModalHeader>
               <Divider />
@@ -534,59 +472,11 @@ export default function EditClassworkModal(props: {
                           </Select>
                         </div>
 
-                        {props.classwork.type === ClassworkType.EXAM && (
-                          <>
-                            <div className="flex flex-col gap-1">
-                              <div>Score</div>
-                              <Input
-                                value={score}
-                                onValueChange={(v) => setScore(v)}
-                                defaultValue={"100"}
-                                type="number"
-                              />
-                            </div>
-
-                            <div className="flex flex-col gap-1">
-                              <div>Deadline</div>
-                              <div className="flex items-center gap-2">
-                                <Datepicker
-                                  inputClassName="relative w-full inline-flex tap-highlight-transparent shadow-sm px-3 bg-default-100 data-[hover=true]:bg-default-200 group-data-[focus=true]:bg-default-100 min-h-unit-10 rounded-medium flex-col items-start justify-center gap-0 transition-background motion-reduce:transition-none !duration-150 outline-none group-data-[focus-visible=true]:z-10 group-data-[focus-visible=true]:ring-2 group-data-[focus-visible=true]:ring-focus group-data-[focus-visible=true]:ring-offset-2 group-data-[focus-visible=true]:ring-offset-background h-14 py-2 is-filled"
-                                  containerClassName="relative w-full"
-                                  useRange={false}
-                                  asSingle={true}
-                                  value={date}
-                                  onChange={handleValueChange}
-                                />
-                                <Input
-                                  onClear={() => setTime("")}
-                                  isInvalid={time.length != 0 && !isValidTime()}
-                                  errorMessage={
-                                    isValidTime() || time.length == 0
-                                      ? null
-                                      : "Invalid time"
-                                  }
-                                  isClearable
-                                  onFocus={() => {
-                                    if (time.length == 0) setTime("23:59");
-                                  }}
-                                  value={time}
-                                  onValueChange={(v) => {
-                                    setTime(v);
-                                  }}
-                                  placeholder="HH:mm (optional)"
-                                  className="w-full"
-                                />
-                              </div>
-                            </div>
-                          </>
-                        )}
-
                         <div className="flex flex-col gap-1">
                           <div>Category</div>
                           <Select
                             items={props.classworkCategories}
                             placeholder="Select a category"
-                            selectedKeys={category ? [category] : []}
                             onSelectionChange={(selection) => {
                               const keys = Array.from(selection) as string[];
                               setCategory(keys[0]?.toString() ?? "");

@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Classwork, IResponseData } from "../../types";
+import {
+  Classwork,
+  ClassworkCategory,
+  ClassworkType,
+  IResponseData,
+} from "../../types";
 import { useParams, useSearchParams } from "react-router-dom";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { Spinner, Tab, Tabs } from "@nextui-org/react";
@@ -13,6 +18,14 @@ import { useEffect, useState } from "react";
 export default function ClassworkPage() {
   const { classroomId, classworkId } = useParams();
   const axios = useAxiosIns();
+  const getClassworkCategoriesQuery = useQuery({
+    queryKey: ["fetch/classwork_categories/classroom", classroomId],
+    queryFn: () =>
+      axios.get<IResponseData<ClassworkCategory[]>>(
+        `/api/v1/classwork/${classroomId}/categories`
+      ),
+    refetchOnWindowFocus: false,
+  });
   const getClassworkQuery = useQuery({
     queryKey: ["fetch/classwork/details", classroomId, classworkId],
     queryFn: () =>
@@ -28,6 +41,8 @@ export default function ClassworkPage() {
       axios.get<IResponseData<Classroom>>(`/api/v1/classrooms/${classroomId}`),
   });
   const { user } = useAuthStore();
+  const classworkCategories =
+    getClassworkCategoriesQuery.data?.data?.data || undefined;
   const classroom = getClassroomQuery.data?.data?.data || undefined;
   const classwork = getClassworkQuery.data?.data?.data || undefined;
   const isOwner = classroom?.owner.id === user?.id;
@@ -43,7 +58,9 @@ export default function ClassworkPage() {
   }, [searchParams]);
   return (
     <>
-      {getClassworkQuery.isLoading || getClassroomQuery.isLoading ? (
+      {getClassworkQuery.isLoading ||
+      getClassroomQuery.isLoading ||
+      getClassworkCategoriesQuery.isLoading ? (
         <div className="w-full h-full flex items-center justify-center">
           <Spinner size="lg" />
         </div>
@@ -62,7 +79,7 @@ export default function ClassworkPage() {
               />
             ) : (
               <>
-                {isProvider ? (
+                {isProvider && classwork.type === ClassworkType.EXAM ? (
                   <Tabs
                     selectedKey={tab}
                     onSelectionChange={(key) => {
@@ -93,6 +110,7 @@ export default function ClassworkPage() {
                       <DetailsTab
                         classroom={classroom}
                         classwork={classwork}
+                        classworkCategories={classworkCategories}
                         isProvider={isProvider}
                       />
                     </Tab>
@@ -117,6 +135,7 @@ export default function ClassworkPage() {
                       classroom={classroom}
                       classwork={classwork}
                       isProvider={isProvider}
+                      classworkCategories={classworkCategories}
                     />
                   </div>
                 )}

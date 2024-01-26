@@ -13,11 +13,7 @@ import {
 } from "@nextui-org/react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAuthStore from "../../stores/auth";
-import {
-  AiOutlineSetting,
-  AiOutlineCalendar,
-  AiOutlineFolderOpen,
-} from "react-icons/ai";
+import { AiOutlineSetting, AiOutlineCalendar } from "react-icons/ai";
 import { IoExitOutline } from "react-icons/io5";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosIns from "../../hooks/useAxiosIns";
@@ -135,11 +131,6 @@ export default function ClassroomPage() {
                 <Tooltip content="Calendar">
                   <Button isIconOnly radius="full" variant="light">
                     <AiOutlineCalendar size={18} />
-                  </Button>
-                </Tooltip>
-                <Tooltip content="Folder">
-                  <Button isIconOnly radius="full" variant="light">
-                    <AiOutlineFolderOpen size={18} />
                   </Button>
                 </Tooltip>
                 {isOwner ? (

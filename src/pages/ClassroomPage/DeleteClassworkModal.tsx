@@ -12,6 +12,7 @@ import { Classwork, IResponseData } from "../../types";
 import { onError } from "../../utils/error-handlers";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { Classroom } from "../../types/classroom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function DeleteClassworkModal(props: {
   isOpen: boolean;
@@ -21,6 +22,8 @@ export default function DeleteClassworkModal(props: {
 }) {
   const axios = useAxiosIns();
   const queryClient = useQueryClient();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const deleteClassworkMutation = useMutation({
     mutationFn: () =>
@@ -30,6 +33,9 @@ export default function DeleteClassworkModal(props: {
     onError,
     onSuccess(data) {
       toast.success(data.data?.message || "Deleted");
+      if (location.pathname.includes(`/classwork/${props.classwork.id}`)) {
+        navigate(-1);
+      }
       queryClient.invalidateQueries([
         "fetch/classworks/classroom",
         props.classroom.id,

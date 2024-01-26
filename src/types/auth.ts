@@ -12,6 +12,8 @@ export interface IUser {
   avatar_url?: string;
   verified: boolean;
   role: Role[];
+  enabled_push_notification: boolean;
+  enabled_email_notification: boolean;
 }
 
 export interface Credentials {

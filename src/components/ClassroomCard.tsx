@@ -9,7 +9,6 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { Classroom } from "../types/classroom";
-import { IoMdFolderOpen } from "react-icons/io";
 import { AiOutlineUser } from "react-icons/ai";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { LuUserSquare2 } from "react-icons/lu";
@@ -71,23 +70,29 @@ export default function ClassroomCard(props: { classroom: Classroom }) {
         <div className="flex items-center justify-end w-full">
           {isTeaching ? (
             <Tooltip content="Open scores">
-              <Button isIconOnly variant="light">
+              <Button
+                onClick={() => {
+                  navigate(`/classroom/${props.classroom.id}?tab=scores`);
+                }}
+                isIconOnly
+                variant="light"
+              >
                 <FaArrowTrendUp className="w-4 h-4" />
               </Button>
             </Tooltip>
           ) : (
             <Tooltip content="Open classwork">
-              <Button isIconOnly variant="light">
+              <Button
+                onClick={() => {
+                  navigate(`/classroom/${props.classroom.id}?tab=classwork`);
+                }}
+                isIconOnly
+                variant="light"
+              >
                 <LuUserSquare2 className="w-4 h-4" />
               </Button>
             </Tooltip>
           )}
-
-          <Tooltip content="Open folder">
-            <Button isIconOnly variant="light">
-              <IoMdFolderOpen className="w-4 h-4" />
-            </Button>
-          </Tooltip>
         </div>
       </CardFooter>
     </Card>

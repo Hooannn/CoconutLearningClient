@@ -16,6 +16,7 @@ import {
 import useNotifications from "../services/notifications";
 import Empty from "./Empty";
 import NotificationCard from "./NotificationCard";
+import { useNavigate } from "react-router-dom";
 
 export default function NotificationBell() {
   const {
@@ -26,6 +27,7 @@ export default function NotificationBell() {
     markAsReadMutation,
     deleteAllMutation,
   } = useNotifications();
+  const navigate = useNavigate();
   return (
     <Popover showArrow placement="bottom-end" offset={12}>
       {unreadCount > 0 ? (
@@ -102,6 +104,15 @@ export default function NotificationBell() {
                   notification={notification}
                 />
               ))}
+              <Button
+                onClick={() => {
+                  navigate("/notifications");
+                }}
+                color="primary"
+                variant="light"
+              >
+                See all
+              </Button>
             </>
           ) : (
             <Empty />
