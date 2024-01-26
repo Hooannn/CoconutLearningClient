@@ -6,14 +6,16 @@ import {
   DropdownTrigger,
   Input,
   User,
+  useDisclosure,
 } from "@nextui-org/react";
 import { AiOutlinePlus, AiOutlineSearch } from "react-icons/ai";
 import useAuthStore from "../stores/auth";
 import useAuth from "../services/auth";
 import NotificationBell from "../components/NotificationBell";
 import JoinClassroomModal from "../components/JoinClassroomModal";
-import { useState } from "react";
 import CreateClassroomModal from "../components/CreateClassroomModal";
+import ProfileModal from "../components/ProfileModal";
+import ConfigurationsModal from "../components/ConfigurationsModal";
 
 export default function NavBar() {
   const { user } = useAuthStore();
@@ -23,18 +25,41 @@ export default function NavBar() {
     signOutMutation.mutate();
   };
 
-  const [shouldJoinModalOpen, setJoinModalOpen] = useState(false);
-  const [shouldCreateModalOpen, setCreateModalOpen] = useState(false);
+  const {
+    isOpen: isJoinModalOpen,
+    onOpen: onJoinModalOpen,
+    onClose: onJoinModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isCreateModalOpen,
+    onOpen: onCreateModalOpen,
+    onClose: onCreateModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isProfileModalOpen,
+    onOpen: onProfileModalOpen,
+    onClose: onProfileModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isConfigurationsModalOpen,
+    onOpen: onConfigurationsModalOpen,
+    onClose: onConfigurationsModalClose,
+  } = useDisclosure();
 
   return (
     <>
-      <JoinClassroomModal
-        isOpen={shouldJoinModalOpen}
-        onClose={() => setJoinModalOpen(false)}
+      <ProfileModal isOpen={isProfileModalOpen} onClose={onProfileModalClose} />
+      <ConfigurationsModal
+        isOpen={isConfigurationsModalOpen}
+        onClose={onConfigurationsModalClose}
       />
+      <JoinClassroomModal isOpen={isJoinModalOpen} onClose={onJoinModalClose} />
       <CreateClassroomModal
-        isOpen={shouldCreateModalOpen}
-        onClose={() => setCreateModalOpen(false)}
+        isOpen={isCreateModalOpen}
+        onClose={onCreateModalClose}
       />
       <div className="w-1/3">
         <Input
@@ -58,14 +83,14 @@ export default function NavBar() {
           </DropdownTrigger>
           <DropdownMenu aria-label="Create or join classroom" variant="flat">
             <DropdownItem
-              onClick={() => setCreateModalOpen(true)}
+              onClick={onCreateModalOpen}
               className="py-2"
               key="create_classroom"
             >
               Create classroom
             </DropdownItem>
             <DropdownItem
-              onClick={() => setJoinModalOpen(true)}
+              onClick={onJoinModalOpen}
               className="py-2"
               key="join_classroom"
             >
@@ -89,12 +114,16 @@ export default function NavBar() {
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="User Actions" variant="flat">
-            <DropdownItem key="settings">My Settings</DropdownItem>
-            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-            <DropdownItem key="analytics">Analytics</DropdownItem>
-            <DropdownItem key="system">System</DropdownItem>
-            <DropdownItem key="configurations">Configurations</DropdownItem>
-            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+            <DropdownItem onClick={onProfileModalOpen} key="profile">
+              Profile
+            </DropdownItem>
+            <DropdownItem
+              onClick={onConfigurationsModalOpen}
+              showDivider
+              key="configurations"
+            >
+              Configurations
+            </DropdownItem>
             <DropdownItem onClick={() => signOut()} key="logout" color="danger">
               Sign Out
             </DropdownItem>

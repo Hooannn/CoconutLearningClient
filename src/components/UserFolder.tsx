@@ -19,10 +19,20 @@ import toast from "react-hot-toast";
 import { AiOutlineClose, AiOutlineUpload } from "react-icons/ai";
 import SVG2 from "./SVG2";
 
-export default function UserFolder(props: {
+type FolderFilter = "image" | "video";
+
+export default function UserFolder({
+  isOpen,
+  onClose,
+  onSelect,
+  filter = [],
+  multipleSelect = true,
+}: {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (files: File[]) => void;
+  filter?: FolderFilter[];
+  multipleSelect?: boolean;
 }) {
   const axios = useAxiosIns();
   const { user } = useAuthStore();
@@ -76,15 +86,20 @@ export default function UserFolder(props: {
       const newFiles = selectedFile.filter((f) => f.id !== file.id);
       setSelectedFile(newFiles);
     } else {
-      const newFiles = [...selectedFile, file];
+      let newFiles = [];
+      if (multipleSelect) {
+        newFiles = [...selectedFile, file];
+      } else {
+        newFiles = [file];
+      }
       setSelectedFile(newFiles);
     }
   };
 
   const select = () => {
-    props.onSelect(selectedFile);
+    onSelect(selectedFile);
     setSelectedFile([]);
-    props.onClose();
+    onClose();
   };
 
   const remove = async () => {
@@ -99,11 +114,25 @@ export default function UserFolder(props: {
   const isLoading =
     removeFilesMutation.isLoading || uploadFileMutation.isLoading;
 
+  const getFiles = () => {
+    if (filter.length === 0) return files;
+    else
+      return files.filter((file) => {
+        if (filter.includes("image") && file.content_type.startsWith("image/"))
+          return true;
+
+        if (filter.includes("video") && file.content_type.startsWith("video/"))
+          return true;
+
+        return false;
+      });
+  };
+
   useEffect(() => {
-    if (props.isOpen) {
+    if (isOpen) {
       getMyFilesQuery.refetch();
     }
-  }, [props.isOpen]);
+  }, [isOpen]);
 
   return (
     <>
@@ -119,8 +148,8 @@ export default function UserFolder(props: {
         size="5xl"
         className="h-[80dvh]"
         isDismissable={false}
-        isOpen={props.isOpen}
-        onClose={props.onClose}
+        isOpen={isOpen}
+        onClose={onClose}
       >
         <ModalContent>
           {() => (
@@ -144,9 +173,9 @@ export default function UserFolder(props: {
                     </div>
                   ) : (
                     <>
-                      {files.length > 0 ? (
+                      {getFiles().length > 0 ? (
                         <div className="flex flex-wrap gap-4">
-                          {files.map((file) => (
+                          {getFiles().map((file) => (
                             <FileCard
                               showCloseButton={false}
                               onClick={onFileCardClicked}
@@ -220,7 +249,7 @@ export default function UserFolder(props: {
                       isLoading={isLoading}
                       color="primary"
                       variant="light"
-                      onPress={props.onClose}
+                      onPress={onClose}
                     >
                       Close
                     </Button>
