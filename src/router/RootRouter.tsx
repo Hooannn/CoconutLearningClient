@@ -7,6 +7,8 @@ import Global from "../Global";
 import ClassroomPage from "../pages/ClassroomPage";
 import CalendarPage from "../pages/CalendarPage";
 import ClassworkPage from "../pages/ClassworkPage";
+import NeedReviewPage from "../pages/NeedReviewPage";
+import TodoPage from "../pages/TodoPage";
 const rootRouter = [
   {
     path: "/",
@@ -30,11 +32,11 @@ const rootRouter = [
       },
       {
         path: "/need-review",
-        element: <div>Hello</div>,
+        element: <NeedReviewPage />,
       },
       {
         path: "/todo",
-        element: <div>Hello</div>,
+        element: <TodoPage />,
       },
       {
         path: "/classroom/:classroomId",
