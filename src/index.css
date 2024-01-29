@@ -55,3 +55,7 @@
     width: 100% !important;
     height: 100% !important;
 }
+#exitButton {
+    display: none !important;
+    opacity: 0 !important;
+}

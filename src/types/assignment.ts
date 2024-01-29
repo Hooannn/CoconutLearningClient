@@ -5,7 +5,6 @@ export interface Assignment {
   author: IUser;
   files: File[];
   description?: string;
-  score?: number;
   submitted: boolean;
   created_at: string;
   updated_at: string;

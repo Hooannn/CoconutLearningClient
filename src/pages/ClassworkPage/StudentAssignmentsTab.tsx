@@ -67,6 +67,13 @@ export default function StudentAssignmentsTab(props: {
             <div className="text-4xl">{props.classwork.assignees.length}</div>
             <small className="opacity-60 text-xs">Assigned</small>
           </div>
+          <div className="flex flex-col border-l-2 border-gray px-3 w-24">
+            <div className="text-4xl">
+              {props.classwork.assignments?.filter((a) => a.grade !== null)
+                .length || 0}
+            </div>
+            <small className="opacity-60 text-xs">Graded</small>
+          </div>
         </div>
         <div>
           <Select

@@ -9,6 +9,7 @@ import CalendarPage from "../pages/CalendarPage";
 import ClassworkPage from "../pages/ClassworkPage";
 import NeedReviewPage from "../pages/NeedReviewPage";
 import TodoPage from "../pages/TodoPage";
+import NotificationPage from "../pages/NotificationPage";
 const rootRouter = [
   {
     path: "/",
@@ -27,6 +28,10 @@ const rootRouter = [
         element: <DashboardPage />,
       },
       {
+        path: "/notification",
+        element: <NotificationPage />,
+      },
+      {
         path: "/calendar",
         element: <CalendarPage />,
       },
@@ -41,6 +46,10 @@ const rootRouter = [
       {
         path: "/classroom/:classroomId",
         element: <ClassroomPage />,
+      },
+      {
+        path: "/classroom/:classroomId/calendar",
+        element: <CalendarPage />,
       },
       {
         path: "/classroom/:classroomId/classwork/:classworkId",

@@ -106,7 +106,7 @@ export default function NotificationBell() {
               ))}
               <Button
                 onClick={() => {
-                  navigate("/notifications");
+                  navigate("/notification");
                 }}
                 color="primary"
                 variant="light"

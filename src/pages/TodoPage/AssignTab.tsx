@@ -10,6 +10,7 @@ import { Classroom } from "../../types/classroom";
 import { useState } from "react";
 import dayjs from "../../libs/dayjs";
 import PreviewClassworkCard from "./PreviewClassworkCard";
+import SVG4 from "../../components/SVG4";
 export default function AssignTab(props: {
   classworks: Classwork[];
   registeredClassrooms: Classroom[];
@@ -55,12 +56,12 @@ export default function AssignTab(props: {
   ];
   return (
     <div className="flex flex-col gap-4 items-start max-w-[980px] mx-auto h-full">
-      {props.registeredClassrooms.length > 0 && (
+      {props.registeredClassrooms.length > 0 ? (
         <>
           <div className="w-1/3">
             <Select
               items={getClassrooms()}
-              placeholder="Select a category"
+              placeholder="Select a classroom"
               variant="bordered"
               color="primary"
               disallowEmptySelection
@@ -115,6 +116,15 @@ export default function AssignTab(props: {
             ))}
           </Accordion>
         </>
+      ) : (
+        <div className="w-full h-96 flex flex-col items-center justify-center">
+          <div className="w-1/4">
+            <SVG4 />
+          </div>
+          <div>
+            <small>Good! You have nothing to do.</small>
+          </div>
+        </div>
       )}
     </div>
   );

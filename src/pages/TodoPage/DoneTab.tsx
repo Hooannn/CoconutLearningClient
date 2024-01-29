@@ -9,6 +9,7 @@ import { Classwork } from "../../types";
 import { Classroom } from "../../types/classroom";
 import { useState } from "react";
 import PreviewClassworkCard from "./PreviewClassworkCard";
+import SVG5 from "../../components/SVG5";
 export default function DoneTab(props: {
   classworks: Classwork[];
   registeredClassrooms: Classroom[];
@@ -43,12 +44,12 @@ export default function DoneTab(props: {
   ];
   return (
     <div className="flex flex-col gap-4 items-start max-w-[980px] mx-auto h-full">
-      {props.registeredClassrooms.length > 0 && (
+      {props.registeredClassrooms.length > 0 ? (
         <>
           <div className="w-1/3">
             <Select
               items={getClassrooms()}
-              placeholder="Select a category"
+              placeholder="Select a classroom"
               variant="bordered"
               color="primary"
               disallowEmptySelection
@@ -103,6 +104,15 @@ export default function DoneTab(props: {
             ))}
           </Accordion>
         </>
+      ) : (
+        <div className="w-full h-96 flex gap-2 flex-col items-center justify-center">
+          <div className="w-24">
+            <SVG5 />
+          </div>
+          <div>
+            <small>Good! You have nothing to do.</small>
+          </div>
+        </div>
       )}
     </div>
   );

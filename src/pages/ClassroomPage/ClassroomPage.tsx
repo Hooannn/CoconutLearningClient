@@ -28,6 +28,7 @@ import ClassroomSetting from "./ClassroomSetting";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { onError } from "../../utils/error-handlers";
+import MeetingTab from "./MeetingTab";
 export default function ClassroomPage() {
   const { classroomId } = useParams();
   const { user } = useAuthStore();
@@ -129,7 +130,14 @@ export default function ClassroomPage() {
               />
               <div className="absolute right-2 flex items-center h-12 gap-1 z-10">
                 <Tooltip content="Calendar">
-                  <Button isIconOnly radius="full" variant="light">
+                  <Button
+                    onClick={() => {
+                      navigate(`/classroom/${classroom?.id}/calendar`);
+                    }}
+                    isIconOnly
+                    radius="full"
+                    variant="light"
+                  >
                     <AiOutlineCalendar size={18} />
                   </Button>
                 </Tooltip>
@@ -227,9 +235,27 @@ export default function ClassroomPage() {
                       </div>
                     }
                   >
-                    <ScoresTab />
+                    <ScoresTab
+                      isOwner={isOwner}
+                      isProvider={isProvider}
+                      classroom={classroom}
+                    />
                   </Tab>
                 )}
+                <Tab
+                  key="meeting"
+                  title={
+                    <div className="flex items-center space-x-2">
+                      <span>Meeting</span>
+                    </div>
+                  }
+                >
+                  <MeetingTab
+                    isOwner={isOwner}
+                    isProvider={isProvider}
+                    classroom={classroom}
+                  />
+                </Tab>
               </Tabs>
             </>
           ) : (
