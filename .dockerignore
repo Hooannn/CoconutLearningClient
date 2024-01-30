@@ -1,0 +1,20 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore build output directory
+dist/
+
+# Ignore development server files
+.vite/
+
+# Ignore development server cache
+.cache/
+
+# Ignore development server logs
+logs/
+
+# Ignore any other temporary or generated files
+*.log
+*.pid
+*.sock
+.DS_Store

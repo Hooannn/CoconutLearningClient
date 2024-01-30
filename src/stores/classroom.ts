@@ -21,9 +21,9 @@ const useClassroomStore = create<ClasroomStore>()(
     (set) => ({
       ...initialState,
       setTeachingClassrooms: (classrooms) =>
-        set((state) => ({ teachingClassrooms: classrooms })),
+        set((_state) => ({ teachingClassrooms: classrooms })),
       setRegisteredClassrooms: (classrooms) =>
-        set((state) => ({ registeredClassrooms: classrooms })),
+        set((_state) => ({ registeredClassrooms: classrooms })),
       reset: () => {
         set(initialState);
       },

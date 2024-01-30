@@ -19,7 +19,7 @@ const useAppStore = create<AppStore>()(
     (set) => ({
       ...initialState,
       setEnabledPushNotifications: (enabledPushNotifications) =>
-        set((state) => ({ enabledPushNotifications })),
+        set((_state) => ({ enabledPushNotifications })),
       setSavedFcmToken: (fcmToken) => ({ fcmToken }),
       reset: () => {
         set(initialState);

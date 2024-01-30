@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { State, create } from "zustand";
+import { create } from "zustand";
 import { createJSONStorage } from "zustand/middleware";
 import { persist } from "zustand/middleware";
 import { IUser } from "../types";
@@ -27,10 +27,10 @@ const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       ...initialState,
-      setLoggedIn: (isLoggedIn) => set((state) => ({ isLoggedIn })),
-      setUser: (user) => set((state) => ({ user })),
-      setAccessToken: (accessToken) => set((state) => ({ accessToken })),
-      setRefreshToken: (refreshToken) => set((state) => ({ refreshToken })),
+      setLoggedIn: (isLoggedIn) => set((_state) => ({ isLoggedIn })),
+      setUser: (user) => set((_state) => ({ user })),
+      setAccessToken: (accessToken) => set((_state) => ({ accessToken })),
+      setRefreshToken: (refreshToken) => set((_state) => ({ refreshToken })),
       reset: () => {
         set(initialState);
       },
