@@ -10,6 +10,8 @@ import ClassworkPage from "../pages/ClassworkPage";
 import NeedReviewPage from "../pages/NeedReviewPage";
 import TodoPage from "../pages/TodoPage";
 import NotificationPage from "../pages/NotificationPage";
+import MeetingPage from "../pages/MeetingPage";
+import WebhookPage from "../pages/WebhookPage";
 const rootRouter = [
   {
     path: "/",
@@ -32,6 +34,10 @@ const rootRouter = [
         element: <NotificationPage />,
       },
       {
+        path: "/webhook",
+        element: <WebhookPage />,
+      },
+      {
         path: "/calendar",
         element: <CalendarPage />,
       },
@@ -46,6 +52,10 @@ const rootRouter = [
       {
         path: "/classroom/:classroomId",
         element: <ClassroomPage />,
+      },
+      {
+        path: "/classroom/:classroomId/meeting/:meetingId",
+        element: <MeetingPage />,
       },
       {
         path: "/classroom/:classroomId/calendar",

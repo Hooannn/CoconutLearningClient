@@ -23,16 +23,16 @@ const useRefreshToken = () => {
   const refreshToken = async () =>
     new Promise<string | null>((resolve, reject) => {
       axiosIns({
-        url: "/auth/refresh",
+        url: "/api/v1/auth/refresh",
         method: "POST",
         validateStatus: null,
         data: {
-          refreshToken: storedRefreshToken,
+          token: storedRefreshToken,
         },
       })
         .then((res) => {
-          const token = res.data?.data?.credentials?.access_token;
-          const refreshToken = res.data?.data?.credentials?.refresh_token;
+          const token = res.data?.data?.access_token;
+          const refreshToken = res.data?.data?.refresh_token;
 
           if (refreshToken) setRefreshToken(refreshToken);
           if (token) {

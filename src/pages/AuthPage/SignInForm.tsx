@@ -89,6 +89,11 @@ export default function SignInForm() {
           color="primary"
           variant="bordered"
           type="email"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           label="Email"
           placeholder="Enter your email"
         />
@@ -104,6 +109,11 @@ export default function SignInForm() {
           color="primary"
           label="Password"
           variant="bordered"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           placeholder="Enter your password"
           endContent={
             <button

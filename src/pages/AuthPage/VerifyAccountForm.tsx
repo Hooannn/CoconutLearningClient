@@ -61,6 +61,11 @@ export default function VerifyAccountForm() {
           variant="bordered"
           label="Signature code"
           placeholder="Enter your code"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
         />
       </div>
       <div className="flex flex-col gap-2 mt-4">

@@ -72,6 +72,11 @@ export default function ResetPasswordForm() {
             },
           })}
           color="primary"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           label="Password"
           variant="bordered"
           placeholder="Enter your new password"
@@ -101,6 +106,11 @@ export default function ResetPasswordForm() {
           color="primary"
           label="Confirm password"
           variant="bordered"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           placeholder="Enter your password again"
           endContent={
             <button
@@ -125,6 +135,11 @@ export default function ResetPasswordForm() {
           })}
           color="primary"
           variant="bordered"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           label="Signature code"
           placeholder="Enter your signature code from your email"
         />

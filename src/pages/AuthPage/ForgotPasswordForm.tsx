@@ -51,6 +51,11 @@ export default function ForgotPasswordForm() {
       </div>
       <div className="mt-6 flex flex-col gap-3">
         <Input
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           startContent={
             <AiOutlineMail className="text-xl text-default-400 pointer-events-none flex-shrink-0" />
           }

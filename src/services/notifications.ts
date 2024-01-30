@@ -122,7 +122,7 @@ const useNotifications = () => {
                 queryClient.invalidateQueries([
                   "fetch/classwork/details",
                   data.classroom_id,
-                  location.pathname.split("/")[3],
+                  location.pathname.split("/")[4],
                 ]);
               }
             }
@@ -132,9 +132,16 @@ const useNotifications = () => {
                 queryClient.invalidateQueries([
                   "fetch/classwork/details",
                   data.classroom_id,
-                  location.pathname.split("/")[3],
+                  location.pathname.split("/")[4],
                 ]);
               }
+            }
+
+            if ([ClassroomUpdateType.MEETING].includes(data.type)) {
+              queryClient.invalidateQueries([
+                "fetch/meeting/classroom",
+                data.classroom_id,
+              ]);
             }
           }
 
@@ -170,6 +177,7 @@ enum ClassroomUpdateType {
   COMMENT = "COMMENT",
   MEMBER = "MEMBER",
   ASSIGNMENT = "ASSIGNMENT",
+  MEETING = "MEETING",
 }
 
 export default useNotifications;

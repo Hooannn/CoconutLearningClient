@@ -1,30 +1,86 @@
+import { useQuery } from "@tanstack/react-query";
+import useAxiosIns from "../../hooks/useAxiosIns";
 import { Classroom } from "../../types/classroom";
+import { Meeting } from "../../types/meeting";
+import { IResponseData } from "../../types";
+import { Button, Divider, Spinner, useDisclosure } from "@nextui-org/react";
+import SVG4 from "../../components/SVG4";
+import { AiOutlinePlus } from "react-icons/ai";
+import CreateMeetingModal from "./CreateMeetingModal";
+import MeetingCard from "./MeetingCard";
 import useAuthStore from "../../stores/auth";
-import { useEffect } from "react";
 export default function MeetingTab(props: {
   classroom: Classroom;
   isOwner: boolean;
   isProvider: boolean;
 }) {
   const { user } = useAuthStore();
+  const axios = useAxiosIns();
+  const getMeetingQuery = useQuery({
+    queryKey: ["fetch/meeting/classroom", props.classroom.id],
+    queryFn: () => {
+      return axios.get<IResponseData<Meeting[]>>(
+        `/api/v1/meeting/classroom/${props.classroom.id}`
+      );
+    },
+    refetchOnWindowFocus: false,
+  });
+  const meetings = getMeetingQuery.data?.data?.data || [];
 
-  useEffect(() => {});
+  const {
+    isOpen: isCreateMeetingModalOpen,
+    onOpen: onOpenCreateMeetingModal,
+    onClose: onCreateMeetingModalClose,
+  } = useDisclosure();
   return (
-    <div className="py-4 px-2 flex flex-col gap-2 items-center mx-auto">
-      <div
-        className="w-full"
-        style={{ height: "calc(100dvh - 82px - 42px - 42px - 42px)" }}
-      >
-        <iframe
-          id="mirotalk-iframe"
-          title="Video Conference"
-          allow="camera; microphone; display-capture; fullscreen; clipboard-read; clipboard-write; autoplay"
-          src={`https://sfu.mirotalk.com/join?room=${
-            props.classroom.id
-          }&name=${`${user?.first_name} ${user?.last_name}`}&audio=0&video=0`}
-          style={{ height: "100%", width: "100%", border: "0px" }}
-        ></iframe>
+    <>
+      <CreateMeetingModal
+        isOpen={isCreateMeetingModalOpen}
+        onClose={onCreateMeetingModalClose}
+        classroom={props.classroom}
+      />
+      <div className="flex flex-col gap-4 items-start max-w-[980px] mx-auto h-full">
+        {getMeetingQuery.isLoading ? (
+          <div className="w-full h-24 flex items-center justify-center">
+            <Spinner size="lg"></Spinner>
+          </div>
+        ) : (
+          <>
+            {props.isProvider && (
+              <Button
+                onClick={onOpenCreateMeetingModal}
+                className="py-6 px-5"
+                color="primary"
+              >
+                <AiOutlinePlus size={16} />
+                Create meeting
+              </Button>
+            )}
+            <Divider className="my-1" />
+            {meetings.length > 0 ? (
+              <div className="w-full flex flex-col gap-2">
+                {meetings.map((meeting) => (
+                  <MeetingCard
+                    key={meeting.id}
+                    meeting={meeting}
+                    classroom={props.classroom}
+                    isOwner={meeting.created_by.id === user?.id}
+                  ></MeetingCard>
+                ))}
+              </div>
+            ) : (
+              <div className="w-full flex items-center justify-center">
+                <div className="w-56 mt-8">
+                  <SVG4 />
+                  <small className="opacity-70">
+                    Good! There are no meeting in current.
+                  </small>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
-    </div>
+    </>
   );
 }

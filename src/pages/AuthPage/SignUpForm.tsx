@@ -90,6 +90,11 @@ export default function SignUpForm() {
             className="w-1/2"
             label="First name"
             placeholder="Enter your first name"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmit(onSubmit)();
+              }
+            }}
           />
 
           <Input
@@ -100,6 +105,11 @@ export default function SignUpForm() {
             color="primary"
             className="w-1/2"
             variant="bordered"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmit(onSubmit)();
+              }
+            }}
             label="Last name"
             placeholder="Enter your last name"
           />
@@ -118,6 +128,11 @@ export default function SignUpForm() {
           variant="bordered"
           type="email"
           label="Email"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           placeholder="Enter your email"
         />
 
@@ -133,6 +148,11 @@ export default function SignUpForm() {
           color="primary"
           label="Password"
           variant="bordered"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           placeholder="Enter your password"
           endContent={
             <button
@@ -159,6 +179,11 @@ export default function SignUpForm() {
           })}
           color="primary"
           label="Confirm password"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(onSubmit)();
+            }
+          }}
           variant="bordered"
           placeholder="Enter your password again"
           endContent={
