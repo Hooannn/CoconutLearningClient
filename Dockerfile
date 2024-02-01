@@ -16,13 +16,6 @@ COPY . .
 # Build the React app
 RUN yarn build
 
-# Set environment variables
-ENV VITE_API_ENDPOINT ""
-ENV VITE_FILE_HOST ""
-ENV VITE_SOCKET_ENDPOINT ""
-ENV VITE_NODE_ENV ""
-ENV VITE_GG_CLIENT_ID ""
-
 # Expose the port that the app will run on
 EXPOSE 4173
 
