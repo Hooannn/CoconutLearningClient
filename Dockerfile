@@ -24,7 +24,7 @@ ENV VITE_NODE_ENV ""
 ENV VITE_GG_CLIENT_ID ""
 
 # Expose the port that the app will run on
-EXPOSE 3000
+EXPOSE 4173
 
 # Start the app
 CMD ["yarn", "preview"]
