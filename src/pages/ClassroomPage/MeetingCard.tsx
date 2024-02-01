@@ -20,6 +20,7 @@ export default function MeetingCard(props: {
   meeting: Meeting;
   classroom: Classroom;
   isOwner: boolean;
+  minified: boolean;
 }) {
   const {
     isOpen: isDeleteMeetingModalOpen,
@@ -40,7 +41,7 @@ export default function MeetingCard(props: {
 
   return (
     <>
-      {props.isOwner && (
+      {props.isOwner && !props.minified && (
         <>
           <DeleteMeetingModal
             isOpen={isDeleteMeetingModalOpen}
@@ -67,7 +68,7 @@ export default function MeetingCard(props: {
         shadow="sm"
         radius="sm"
       >
-        <CardBody className="p-5">
+        <CardBody className={props.minified ? "" : "p-5"}>
           <div className="flex items-center justify-between w-full">
             <div>
               {isDoing && (
@@ -77,13 +78,23 @@ export default function MeetingCard(props: {
                   </div>
                 </>
               )}
-              <div className="text-sm opacity-80">
+              <div
+                className={
+                  props.minified ? "text-xs opacity-80" : "text-sm opacity-80"
+                }
+              >
                 {dayjs(props.meeting.start_at).format("MMMM D, YYYY HH:mm")} -{" "}
                 {dayjs(props.meeting.end_at).format("MMMM D, YYYY HH:mm")}
               </div>
-              <div className="text-lg font-bold">{props.meeting.name}</div>
+              <div
+                className={
+                  props.minified ? "text-sm font-bold" : "text-lg font-bold"
+                }
+              >
+                {props.meeting.name}
+              </div>
             </div>
-            {props.isOwner && (
+            {props.isOwner && !props.minified && (
               <Dropdown placement="left-end">
                 <DropdownTrigger>
                   <Button radius="full" isIconOnly variant="light">
@@ -113,21 +124,23 @@ export default function MeetingCard(props: {
           <div className="mt-2">
             <User
               name={
-                props.meeting.created_by?.first_name +
-                " " +
-                props.meeting.created_by?.last_name
+                <div className={`${props.minified ? "text-xs" : ""}`}>
+                  {props.meeting.created_by?.first_name +
+                    " " +
+                    props.meeting.created_by?.last_name}
+                </div>
               }
               avatarProps={{
                 src: props.meeting.created_by?.avatar_url,
                 fallback: (
                   <AiOutlineUser
-                    className="w-6 h-6 text-default-500"
+                    className="w-4 h-4 text-default-500"
                     fill="currentColor"
                     size={20}
                   />
                 ),
                 showFallback: true,
-                className: "w-10 h-10",
+                className: props.minified ? "w-6 h-6" : "w-10 h-10",
               }}
             />
           </div>

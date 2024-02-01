@@ -18,7 +18,7 @@ import { GrPowerReset } from "react-icons/gr";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosIns from "../../hooks/useAxiosIns";
 import { onError } from "../../utils/error-handlers";
-import { Classwork, File, IResponseData, Post } from "../../types";
+import { Classwork, File, IResponseData, Meeting, Post } from "../../types";
 import useAuthStore from "../../stores/auth";
 import { AiOutlineUser } from "react-icons/ai";
 import SVG1 from "../../components/SVG1";
@@ -30,6 +30,7 @@ import UserFolder from "../../components/UserFolder";
 import FileCard from "../../components/FileCard";
 import dayjs from "../../libs/dayjs";
 import { useNavigate } from "react-router-dom";
+import MeetingCard from "./MeetingCard";
 
 export default function FeedTab(props: {
   classroom: Classroom;
@@ -72,6 +73,16 @@ export default function FeedTab(props: {
     refetchOnWindowFocus: false,
   });
 
+  const getUpcomingMeetingsQuery = useQuery({
+    queryKey: ["fetch/upcoming/meetings", props.classroom.id],
+    queryFn: () =>
+      axios.get<IResponseData<Meeting[]>>(
+        `/api/v1/meeting/classroom/${props.classroom.id}/upcoming`
+      ),
+    refetchOnWindowFocus: false,
+  });
+
+  const upcomingMeetings = getUpcomingMeetingsQuery.data?.data?.data || [];
   const upcomingClassworks = getUpcomingClassworkQuery.data?.data?.data || [];
   const posts = getPostsQuery.data?.data?.data || [];
 
@@ -262,6 +273,58 @@ export default function FeedTab(props: {
                 <Button
                   onClick={() => {
                     navigate(`/classroom/${props.classroom.id}?tab=classwork`);
+                  }}
+                  size="sm"
+                  color="primary"
+                  variant="light"
+                >
+                  <strong>See all</strong>
+                </Button>
+              </CardBody>
+            </Card>
+            <Card shadow="sm">
+              <CardBody>
+                <div className="flex items-center justify-between">
+                  <div className="text-small font-semibold">Meeting</div>
+                </div>
+                {getUpcomingMeetingsQuery.isLoading ? (
+                  <div className="flex flex-col gap-2 py-2">
+                    {Array(3)
+                      .fill(null)
+                      .map((_, i) => (
+                        <Skeleton
+                          key={"Skeleton::ssssss" + i}
+                          className="rounded-lg w-full"
+                        >
+                          <div className="w-full h-12 rounded-lg bg-default-300"></div>
+                        </Skeleton>
+                      ))}
+                  </div>
+                ) : (
+                  <>
+                    {upcomingMeetings.length > 0 ? (
+                      <div className="flex flex-col gap-2 py-2">
+                        {upcomingMeetings.map((meeting) => (
+                          <MeetingCard
+                            minified
+                            key={meeting.id}
+                            meeting={meeting}
+                            classroom={props.classroom}
+                            isOwner={meeting.created_by.id === user?.id}
+                          ></MeetingCard>
+                        ))}
+                      </div>
+                    ) : (
+                      <small className="my-2">
+                        Good! There are no upcoming meetings
+                      </small>
+                    )}
+                  </>
+                )}
+
+                <Button
+                  onClick={() => {
+                    navigate(`/classroom/${props.classroom.id}?tab=meeting`);
                   }}
                   size="sm"
                   color="primary"

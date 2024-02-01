@@ -61,6 +61,7 @@ export default function MeetingTab(props: {
               <div className="w-full flex flex-col gap-2">
                 {meetings.map((meeting) => (
                   <MeetingCard
+                    minified={false}
                     key={meeting.id}
                     meeting={meeting}
                     classroom={props.classroom}
