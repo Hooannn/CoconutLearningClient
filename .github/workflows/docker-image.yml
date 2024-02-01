@@ -25,4 +25,10 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          build-args: |
+            VITE_API_ENDPOINT=${{ secrets.VITE_API_ENDPOINT }}
+            VITE_FILE_HOST=${{ secrets.VITE_FILE_HOST }}
+            VITE_SOCKET_ENDPOINT=${{ secrets.VITE_SOCKET_ENDPOINT }}
+            VITE_NODE_ENV=${{ secrets.VITE_NODE_ENV }}
+            VITE_GG_CLIENT_ID=${{ secrets.VITE_GG_CLIENT_ID }}
           tags: hoanthui123/coconutclient:latest
