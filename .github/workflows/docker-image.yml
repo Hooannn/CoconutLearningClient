@@ -33,6 +33,10 @@ jobs:
             VITE_GG_CLIENT_ID=${{ secrets.VITE_GG_CLIENT_ID }}
           tags: hoanthui123/coconutclient:latest
 
+  trigger-deployment:
+    runs-on: ubuntu-latest
+    needs: build-and-push-docker-image
+    steps:
       - name: Trigger Deployment
         run: |
           curl -X POST \
