@@ -32,3 +32,13 @@ jobs:
             VITE_NODE_ENV=${{ secrets.VITE_NODE_ENV }}
             VITE_GG_CLIENT_ID=${{ secrets.VITE_GG_CLIENT_ID }}
           tags: hoanthui123/coconutclient:latest
+
+      - name: Trigger Deployment
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/Hooannn/CoconutDeployment/actions/workflows/deploy.yml/dispatches" \
+            -d '{"ref":"main"}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
