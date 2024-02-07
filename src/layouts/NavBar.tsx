@@ -4,11 +4,10 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Input,
   User,
   useDisclosure,
 } from "@nextui-org/react";
-import { AiOutlinePlus, AiOutlineSearch } from "react-icons/ai";
+import { AiOutlinePlus } from "react-icons/ai";
 import useAuthStore from "../stores/auth";
 import useAuth from "../services/auth";
 import NotificationBell from "../components/NotificationBell";
@@ -61,19 +60,7 @@ export default function NavBar() {
         isOpen={isCreateModalOpen}
         onClose={onCreateModalClose}
       />
-      <div className="w-1/3">
-        <Input
-          color="primary"
-          variant="bordered"
-          label="Search"
-          isClearable
-          radius="lg"
-          placeholder="Type to search..."
-          startContent={
-            <AiOutlineSearch className="text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0" />
-          }
-        />
-      </div>
+      <div className="w-1/3"></div>
       <div className="flex items-center gap-3">
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
