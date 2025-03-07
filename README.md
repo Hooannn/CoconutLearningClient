@@ -30,7 +30,7 @@ technologies used, CI/CD setup, and deployment process.
 
 - **Jitsi as a Service**: Integrate with [JaaS](https://jaas.8x8.vc/#/) for meeting feature. Embed Jitsi meeting to
   React client, manage meeting tokens in Spring boot server.
- 
+
 - **Portainer**: Using [portainer](https://github.com/portainer/portainer) for Docker management
 
 - **Nginx**: In the hosted VPS, using nginx to forward all requests to suitable domains
